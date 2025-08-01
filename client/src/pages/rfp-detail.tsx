@@ -227,10 +227,10 @@ export default function RfpDetail() {
                     </div>
                   </div>
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-green-800 font-medium mb-2">Professional RFP Document</p>
+                    <p className="text-green-800 font-medium mb-2">Official RFP Documentation</p>
                     <p className="text-green-700 text-sm">
                       Complete RFP documentation including technical specifications, submission requirements, 
-                      evaluation criteria, and procurement guidelines. Download requires valid business email.
+                      evaluation criteria, and procurement guidelines. Business email required for download access.
                     </p>
                   </div>
                   <div className="text-sm text-gray-600">
