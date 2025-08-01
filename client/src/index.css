@@ -137,3 +137,6 @@
     transform: rotate(360deg);
   }
 }
+
+/* Production cache refresh */
+.production-mode { opacity: 1; }
