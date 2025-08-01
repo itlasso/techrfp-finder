@@ -5,6 +5,8 @@ TechRFP Finder is a web application that helps developers and technology profess
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+GitHub repository: https://github.com/itlasso
+CMS preference: Drupal is the go-to CMS (prioritized in search results and highlighted)
 
 # System Architecture
 
