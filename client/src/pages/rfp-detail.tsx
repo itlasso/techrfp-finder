@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Clock, MapPin, DollarSign, Building, Users, Globe, FileText, Download, ExternalLink, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import type { Rfp } from "@shared/schema";
@@ -212,6 +212,9 @@ export default function RfpDetail() {
                     <Download className="w-5 h-5 mr-2" />
                     RFP Document Download
                   </DialogTitle>
+                  <DialogDescription>
+                    Download the official RFP document with detailed requirements and specifications.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -251,6 +254,9 @@ export default function RfpDetail() {
                     <ExternalLink className="w-5 h-5 mr-2" />
                     Organization Website
                   </DialogTitle>
+                  <DialogDescription>
+                    Visit the organization's official website to learn more about their mission and projects.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -291,6 +297,9 @@ export default function RfpDetail() {
                     <Mail className="w-5 h-5 mr-2" />
                     Contact Information
                   </DialogTitle>
+                  <DialogDescription>
+                    Get in touch with the organization to express interest and ask questions about this RFP.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="bg-gray-50 rounded-lg p-4">
