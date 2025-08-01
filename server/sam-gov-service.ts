@@ -40,7 +40,7 @@ export interface SamGovResponse {
 
 export class SamGovService {
   private readonly apiKey: string;
-  private readonly baseUrl = 'https://api.sam.gov/opportunities/v2/search';
+  private readonly baseUrl = 'https://api.sam.gov/opportunities/v1/search';
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
@@ -79,11 +79,11 @@ export class SamGovService {
     const url = `${this.baseUrl}?${searchParams.toString()}`;
     
     try {
-      // Try both authentication methods per SAM.gov documentation
+      // Use correct SAM.gov API authentication with x-api-key header
       const headers: Record<string, string> = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'X-Api-Key': this.apiKey,
+        'x-api-key': this.apiKey,
       };
 
       console.log(`Testing SAM.gov API with URL: ${url}`);
