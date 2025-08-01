@@ -399,12 +399,36 @@ Best regards`);
               <p className="text-gray-600">{rfp.location}</p>
               {rfp.contactEmail && (
                 <p className="text-brand-teal font-medium mt-1">
-                  Email: {rfp.contactEmail}
+                  Email: <a 
+                    href={`mailto:${rfp.contactEmail}?subject=${encodeURIComponent(`Inquiry about RFP: ${rfp.title}`)}`}
+                    className="hover:underline cursor-pointer"
+                  >
+                    {rfp.contactEmail}
+                  </a>
                 </p>
               )}
               {rfp.organizationWebsite && (
                 <p className="text-brand-teal font-medium">
-                  Website: <a href={rfp.organizationWebsite} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  Website: <a 
+                    href={rfp.organizationWebsite} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="hover:underline cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Show organization info instead of broken demo links
+                      alert(`🌐 Organization Website
+
+${rfp.organization}
+Location: ${rfp.location}
+Type: ${rfp.organizationType}
+${rfp.contactEmail ? `Email: ${rfp.contactEmail}` : ''}
+
+In a real application, this would open their official website.
+
+Website: ${rfp.organizationWebsite}`);
+                    }}
+                  >
                     {rfp.organizationWebsite.replace('https://', '').replace('http://', '')}
                   </a>
                 </p>
