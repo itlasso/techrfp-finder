@@ -61,9 +61,22 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
+  const host = process.env.HOST || 'localhost';
   
-  // macOS compatibility: Use 127.0.0.1 instead of 0.0.0.0
-  server.listen(port, '127.0.0.1', () => {
-    log(`serving on 127.0.0.1:${port}`);
+  console.log(`Starting server on ${host}:${port}...`);
+  
+  // Try multiple binding approaches for macOS compatibility
+  server.listen(port, host, () => {
+    console.log(`✅ Server started successfully!`);
+    console.log(`🌐 Access your application at: http://${host}:${port}`);
+    console.log(`📝 Alternative access: http://localhost:${port}`);
+    log(`serving on ${host}:${port}`);
+  }).on('error', (err) => {
+    console.error(`❌ Server failed to start on ${host}:${port}`);
+    console.error('Error:', err.message);
+    console.log('💡 Try these solutions:');
+    console.log('   1. Change port: PORT=3000 npm run dev');
+    console.log('   2. Use different host: HOST=0.0.0.0 npm run dev');
+    console.log('   3. Check if port is already in use');
   });
 })();
