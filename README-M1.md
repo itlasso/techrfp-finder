@@ -1,7 +1,13 @@
 # TechRFP Finder - Apple Silicon Setup
 
-## Quick Start for M1 Ultra Mac
+## Important: Two Different Environments
 
+### Replit Cloud Environment
+- The main application runs at: **Replit's web interface**
+- Access through Replit's built-in browser or public URL
+- Full SAM.gov integration with professional demo data
+
+### Local M1 Ultra Mac Setup
 The application has been optimized for Apple Silicon architecture.
 
 ### Method 1: Apple Silicon Optimized Server
