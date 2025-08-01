@@ -151,6 +151,7 @@ export class MemStorage implements IStorage {
         postedDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000), // Random date within last 30 days
         budgetMin: rfp.budgetMin ?? null,
         budgetMax: rfp.budgetMax ?? null,
+        contactEmail: rfp.contactEmail ?? null,
         isDrupal: rfp.isDrupal ?? false,
         isActive: rfp.isActive ?? true,
       };
@@ -257,6 +258,7 @@ export class MemStorage implements IStorage {
       postedDate: new Date(),
       budgetMin: insertRfp.budgetMin ?? null,
       budgetMax: insertRfp.budgetMax ?? null,
+      contactEmail: insertRfp.contactEmail ?? null,
       isDrupal: insertRfp.isDrupal ?? false,
       isActive: insertRfp.isActive ?? true,
     };

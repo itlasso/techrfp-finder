@@ -1,5 +1,6 @@
 import { Calendar, Clock, MapPin, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 import type { Rfp } from "@shared/schema";
 
 interface RfpCardProps {
@@ -7,6 +8,7 @@ interface RfpCardProps {
 }
 
 export function RfpCard({ rfp }: RfpCardProps) {
+  const [location, navigate] = useLocation();
   const formatBudget = (min?: number | null, max?: number | null) => {
     if (!min && !max) return "Budget not specified";
     if (min && max) {
@@ -66,7 +68,10 @@ export function RfpCard({ rfp }: RfpCardProps) {
               Due in {daysUntilDeadline} days
             </span>
           </div>
-          <h4 className="text-lg font-semibold text-black mb-2 hover:text-brand-orange cursor-pointer">
+          <h4 
+            className="text-lg font-semibold text-black mb-2 hover:text-brand-orange cursor-pointer"
+            onClick={() => navigate(`/rfp/${rfp.id}`)}
+          >
             {rfp.title}
           </h4>
           <p className="text-gray-600 mb-2">{rfp.organization}</p>
@@ -100,7 +105,10 @@ export function RfpCard({ rfp }: RfpCardProps) {
           <Button variant="ghost" size="sm" className="text-brand-teal hover:text-brand-teal">
             <Bookmark className="w-4 h-4" />
           </Button>
-          <Button className="bg-brand-orange text-white hover:bg-brand-orange">
+          <Button 
+            className="bg-brand-orange text-white hover:bg-brand-orange"
+            onClick={() => navigate(`/rfp/${rfp.id}`)}
+          >
             View Details
           </Button>
         </div>
