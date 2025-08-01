@@ -46,6 +46,8 @@ A web application for discovering and browsing technology Request for Proposal (
 cd techrfp-finder-main
 ```
 
+> **Note**: If the repository doesn't exist yet, you can get the initial files by downloading from the Replit environment where this was developed, or by following the GitHub setup instructions below.
+
 ### Option 2: Clone the Repository
 
 ```bash
