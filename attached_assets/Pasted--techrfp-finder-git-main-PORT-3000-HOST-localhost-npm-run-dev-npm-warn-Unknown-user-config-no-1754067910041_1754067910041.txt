@@ -1,0 +1,71 @@
+➜  techrfp-finder git:(main) ✗ PORT=3000 HOST=localhost npm run dev
+npm warn Unknown user config "node_gyp". This will stop working in the next major version of npm.
+npm warn Unknown user config "msvs_version". This will stop working in the next major version of npm.
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+Initializing RFP data...
+SAM.gov service available: true
+API key configured: true
+Starting real RFP data loading...
+Loading real RFP data from SAM.gov...
+Testing SAM.gov API connectivity...
+Testing SAM.gov API with URL: https://api.sam.gov/opportunities/v1/search?postedFrom=01%2F01%2F2024&postedTo=08%2F01%2F2025&limit=1&offset=0&title=software
+Using API key: B4ferHa3...
+node:events:485
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen ENOTSUP: operation not supported on socket 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    at listenInCluster (node:net:1997:12)
+    at node:net:2206:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'ENOTSUP',
+  errno: -45,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+
+Node.js v24.5.0
+➜  techrfp-finder git:(main) ✗ PORT=8080 npm run dev
+npm warn Unknown user config "node_gyp". This will stop working in the next major version of npm.
+npm warn Unknown user config "msvs_version". This will stop working in the next major version of npm.
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+Initializing RFP data...
+SAM.gov service available: true
+API key configured: true
+Starting real RFP data loading...
+Loading real RFP data from SAM.gov...
+Testing SAM.gov API connectivity...
+Testing SAM.gov API with URL: https://api.sam.gov/opportunities/v1/search?postedFrom=01%2F01%2F2024&postedTo=08%2F01%2F2025&limit=1&offset=0&title=software
+Using API key: B4ferHa3...
+node:events:485
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen ENOTSUP: operation not supported on socket 0.0.0.0:8080
+    at Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    at listenInCluster (node:net:1997:12)
+    at node:net:2206:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'ENOTSUP',
+  errno: -45,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 8080
+}
+
+Node.js v24.5.0
+➜  techrfp-finder git:(main) ✗
