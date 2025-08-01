@@ -29,6 +29,8 @@ The REST API provides endpoints for RFP operations including listing RFPs with f
 - **User Experience**: Implemented clickable RFP titles, email links, and "View Details" buttons for seamless navigation
 - **Data Quality**: Transitioned from demo data to authentic federal contracting opportunities from official sources
 - **Error Handling**: Added robust API connectivity testing and graceful fallback mechanisms
+- **Apple Silicon Compatibility**: Resolved M1 Ultra networking issues with Node.js 20 LTS and optimized server configurations
+- **Local Development**: Successfully deployed on user's M1 Ultra Mac with full functionality at localhost:8080
 
 ## External Dependencies
 
