@@ -21,6 +21,14 @@ const host = '127.0.0.1'; // Force IPv4 localhost for M1 compatibility
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'client')));
 
+// Debug: Log file serving
+app.use((req, res, next) => {
+  if (req.url.includes('.')) {
+    console.log(`📁 Serving file: ${req.url}`);
+  }
+  next();
+});
+
 // Mock API endpoints for demo
 const mockRfps = [
   {
@@ -64,7 +72,27 @@ app.get('/api/rfps/:id', (req, res) => {
 
 // Serve main application
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/index.html'));
+  const htmlPath = path.join(__dirname, 'client/index.html');
+  console.log(`🌐 Serving HTML from: ${htmlPath}`);
+  
+  // Check if file exists
+  import('fs').then(fs => {
+    if (fs.existsSync(htmlPath)) {
+      res.sendFile(htmlPath);
+    } else {
+      console.log(`❌ HTML file not found at: ${htmlPath}`);
+      res.status(404).send(`
+        <html>
+          <body>
+            <h1>TechRFP Finder</h1>
+            <p>HTML file not found. Please build the project first:</p>
+            <pre>npm run build</pre>
+            <p>File expected at: ${htmlPath}</p>
+          </body>
+        </html>
+      `);
+    }
+  });
 });
 
 // Apple Silicon specific server binding
