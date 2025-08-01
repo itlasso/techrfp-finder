@@ -43,3 +43,36 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+// Document downloads tracking for professional environment
+export const documentDownloads = pgTable("document_downloads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  rfpId: varchar("rfp_id").notNull(),
+  userEmail: text("user_email").notNull(),
+  downloadedAt: timestamp("downloaded_at").notNull().default(sql`now()`),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+});
+
+// RFP favorites/bookmarks for user tracking
+export const rfpBookmarks = pgTable("rfp_bookmarks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  rfpId: varchar("rfp_id").notNull(),
+  userEmail: text("user_email").notNull(),
+  bookmarkedAt: timestamp("bookmarked_at").notNull().default(sql`now()`),
+});
+
+// Search analytics for improving platform
+export const searchAnalytics = pgTable("search_analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  searchTerm: text("search_term"),
+  filterTechnology: text("filter_technology"),
+  filterOrganizationType: text("filter_organization_type"),
+  resultsCount: integer("results_count"),
+  searchedAt: timestamp("searched_at").notNull().default(sql`now()`),
+  userSession: text("user_session"),
+});
+
+export type DocumentDownload = typeof documentDownloads.$inferSelect;
+export type RfpBookmark = typeof rfpBookmarks.$inferSelect;
+export type SearchAnalytic = typeof searchAnalytics.$inferSelect;

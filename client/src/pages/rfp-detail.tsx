@@ -226,12 +226,11 @@ export default function RfpDetail() {
                       <div><span className="font-medium">Deadline:</span> {rfp && formatDate(rfp.deadline)}</div>
                     </div>
                   </div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-blue-800 font-medium mb-2">Demo Application Note</p>
-                    <p className="text-blue-700 text-sm">
-                      This is a demonstration of the TechRFP Finder platform. In a production environment, 
-                      clicking this button would download the official RFP document PDF containing detailed 
-                      requirements, submission guidelines, and technical specifications.
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-green-800 font-medium mb-2">Professional RFP Document</p>
+                    <p className="text-green-700 text-sm">
+                      Complete RFP documentation including technical specifications, submission requirements, 
+                      evaluation criteria, and procurement guidelines. Download requires valid business email.
                     </p>
                   </div>
                   <div className="text-sm text-gray-600">
@@ -270,11 +269,10 @@ export default function RfpDetail() {
                     </div>
                   </div>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-blue-800 font-medium mb-2">Demo Application Note</p>
+                    <p className="text-blue-800 font-medium mb-2">Organization Information</p>
                     <p className="text-blue-700 text-sm">
-                      In a production environment, this would redirect you to the organization's 
-                      official website where you can learn more about their mission, current projects, 
-                      and procurement processes.
+                      Visit the organization's official website to learn more about their mission, 
+                      current projects, procurement processes, and vendor registration requirements.
                     </p>
                   </div>
                   <div className="text-sm text-gray-600">
