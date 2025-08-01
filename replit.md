@@ -11,7 +11,7 @@ CMS preference: Drupal is the go-to CMS (prioritized in search results and highl
 # System Architecture
 
 ## Frontend Architecture
-The application uses a modern React-based frontend built with TypeScript and Vite as the build tool. The UI is constructed using shadcn/ui components built on Radix UI primitives, providing a consistent and accessible design system. TailwindCSS handles styling with a custom design system featuring brand colors (orange, teal, black, white). The frontend implements client-side routing using Wouter for navigation and TanStack Query for server state management and data fetching.
+The application uses a modern React-based frontend built with TypeScript and Vite as the build tool. The UI is constructed using shadcn/ui components built on Radix UI primitives, providing a consistent and accessible design system. TailwindCSS handles styling with a custom design system featuring brand colors (orange, teal, black, white). The frontend implements client-side routing using Wouter for navigation between the main RFP browser and detailed RFP views, and TanStack Query for server state management and data fetching.
 
 ## Backend Architecture
 The backend is an Express.js server written in TypeScript that serves both API endpoints and static files. The server uses a middleware-based architecture with custom logging, error handling, and request/response processing. In development, it integrates with Vite's development server for hot module replacement and seamless development experience.
@@ -20,7 +20,13 @@ The backend is an Express.js server written in TypeScript that serves both API e
 The application uses a dual storage approach. In development and demo environments, it relies on an in-memory storage implementation with seeded mock data for RFPs. For production, it's configured to use PostgreSQL as the primary database with Drizzle ORM for type-safe database operations and schema management. The database schema includes tables for RFPs and users, with comprehensive filtering and search capabilities.
 
 ## API Structure
-The REST API provides endpoints for RFP operations including listing RFPs with filtering capabilities, retrieving individual RFPs by ID, and generating technology statistics for filter options. The API supports query parameters for search, technology filtering, deadline filtering, budget range filtering, and organization type filtering. All responses are JSON-formatted with proper error handling and HTTP status codes.
+The REST API provides endpoints for RFP operations including listing RFPs with filtering capabilities, retrieving individual RFPs by ID, and generating technology statistics for filter options. The API supports query parameters for search, technology filtering, deadline filtering, budget range filtering, and organization type filtering. Navigation between the browser and detailed views is handled client-side with the individual RFP endpoint (`/api/rfps/:id`) providing comprehensive project details. All responses are JSON-formatted with proper error handling and HTTP status codes.
+
+## Recent Changes (August 2025)
+- **Navigation Enhancement**: Added full RFP detail view functionality with comprehensive project information display
+- **User Experience**: Implemented clickable RFP titles and "View Details" buttons for seamless navigation
+- **Data Display**: Created detailed RFP pages showing budget breakdowns, deadlines, application instructions, and organization details
+- **Code Quality**: Resolved TypeScript type issues in storage layer for better maintainability
 
 ## External Dependencies
 
