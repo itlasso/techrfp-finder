@@ -1,0 +1,64 @@
+➜  techrfp-finder git:(main) ✗ # Install Node.js 20 LTS which has better Apple Silicon support
+brew install node@20
+export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
+node --version  # Should show v20.x.x
+npm run dev
+==> Downloading https://formulae.brew.sh/api/formula.jws.json
+==> Downloading https://formulae.brew.sh/api/cask.jws.json
+==> Fetching downloads for: node@20
+==> Downloading https://ghcr.io/v2/homebrew/core/node/20/manifests/20.19.4
+##################################################################################################### 100.0%
+==> Fetching node@20
+==> Downloading https://ghcr.io/v2/homebrew/core/node/20/blobs/sha256:62e9c3a38ade4feee40a8afd3be4aae9956b3a
+##################################################################################################### 100.0%
+==> Pouring node@20--20.19.4.arm64_sequoia.bottle.tar.gz
+==> Caveats
+node@20 is keg-only, which means it was not symlinked into /opt/homebrew,
+because this is an alternate version of another formula.
+
+If you need to have node@20 first in your PATH, run:
+  echo 'export PATH="/opt/homebrew/opt/node@20/bin:$PATH"' >> ~/.zshrc
+
+For compilers to find node@20 you may need to set:
+  export LDFLAGS="-L/opt/homebrew/opt/node@20/lib"
+  export CPPFLAGS="-I/opt/homebrew/opt/node@20/include"
+==> Summary
+🍺  /opt/homebrew/Cellar/node@20/20.19.4: 2,068 files, 51MB
+==> Running `brew cleanup node@20`...
+Disable this behaviour by setting HOMEBREW_NO_INSTALL_CLEANUP.
+Hide these hints with HOMEBREW_NO_ENV_HINTS (see `man brew`).
+==> No outdated dependents to upgrade!
+v20.19.4
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+Initializing RFP data...
+SAM.gov service available: true
+API key configured: true
+Starting real RFP data loading...
+Loading real RFP data from SAM.gov...
+Testing SAM.gov API connectivity...
+Testing SAM.gov API with URL: https://api.sam.gov/opportunities/v1/search?postedFrom=01%2F01%2F2024&postedTo=08%2F01%2F2025&limit=1&offset=0&title=software
+Using API key: B4ferHa3...
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use 0.0.0.0:5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at doListen (node:net:2139:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 5000
+}
+
+Node.js v20.19.4
+➜  techrfp-finder git:(main) ✗
