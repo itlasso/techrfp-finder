@@ -1,0 +1,81 @@
+➜  techrfp-finder git:(main) ✗ # Method 1: Build and serve (most reliable for M1)
+npm run build
+PORT=3000 node server-simple.js
+
+# Method 2: Use the automated script
+chmod +x start-local.sh
+./start-local.sh
+
+# Method 3: Development server on different port
+PORT=8080 HOST=127.0.0.1 npm run dev
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v7.0.6 building for production...
+transforming (1) src/main.tsxBrowserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 1722 modules transformed.
+../dist/public/index.html                   0.63 kB │ gzip:   0.38 kB
+../dist/public/assets/index-L76MsO0R.css   74.11 kB │ gzip:  12.60 kB
+../dist/public/assets/index-CbhRrtuM.js   361.38 kB │ gzip: 113.15 kB
+✓ built in 1.79s
+
+  dist/index.js  30.7kb
+
+⚡ Done in 2ms
+node:internal/modules/cjs/loader:1215
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/epowell/Sites/apps/techrfp-finder/server-simple.js'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+    at Module._load (node:internal/modules/cjs/loader:1043:27)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)
+    at node:internal/main/run_main_module:28:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v20.19.4
+chmod: start-local.sh: No such file or directory
+zsh: no such file or directory: ./start-local.sh
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+Initializing RFP data...
+SAM.gov service available: true
+API key configured: true
+Starting real RFP data loading...
+Loading real RFP data from SAM.gov...
+Testing SAM.gov API connectivity...
+Testing SAM.gov API with URL: https://api.sam.gov/opportunities/v1/search?postedFrom=01%2F01%2F2024&postedTo=08%2F01%2F2025&limit=1&offset=0&title=software
+Using API key: B4ferHa3...
+1:29:25 PM [express] serving on port 8080
+SAM.gov API response status: 403
+SAM.gov API error response: {
+  "error": {
+    "code": "API_KEY_INVALID",
+    "message": "An invalid API key was supplied. Please submit with a valid API key."
+  }
+}
+Error fetching from SAM.gov API: Error: SAM.gov API error: 403 Forbidden
+    at SamGovService.searchOpportunities (/Users/epowell/Sites/apps/techrfp-finder/server/sam-gov-service.ts:99:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async MemStorage.loadRealRfps (/Users/epowell/Sites/apps/techrfp-finder/server/storage.ts:64:28)
+Error loading real RFP data: Error: SAM.gov API error: 403 Forbidden
+    at SamGovService.searchOpportunities (/Users/epowell/Sites/apps/techrfp-finder/server/sam-gov-service.ts:99:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async MemStorage.loadRealRfps (/Users/epowell/Sites/apps/techrfp-finder/server/storage.ts:64:28)
+Error details: SAM.gov API error: 403 Forbidden
+SAM.gov API access issue: The API key may require additional permissions.
+Common solutions:
+  1. Ensure your SAM.gov account has "System Account" permissions
+  2. Verify the API key is for the correct endpoint (Public vs System Account)
+  3. Check if the key needs federal government account verification
+  4. Contact SAM.gov support at www.fsd.gov for account verification
+SAM.gov integration framework is fully operational.
+Using professional-grade demo data while API permissions are resolved.
+The system will automatically switch to live SAM.gov data once API access is confirmed.
