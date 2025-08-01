@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, Clock, MapPin, DollarSign, Building, Users, Globe, FileText } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, MapPin, DollarSign, Building, Users, Globe, FileText, Download, ExternalLink, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import type { Rfp } from "@shared/schema";
@@ -11,6 +13,9 @@ export default function RfpDetail() {
   const params = useParams();
   const [location, navigate] = useLocation();
   const rfpId = params.id;
+  const [documentDialogOpen, setDocumentDialogOpen] = useState(false);
+  const [websiteDialogOpen, setWebsiteDialogOpen] = useState(false);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
 
   const { data: rfp, isLoading, error } = useQuery<Rfp>({
     queryKey: ["/api/rfps", rfpId],
@@ -62,45 +67,15 @@ export default function RfpDetail() {
   };
 
   const handleDownloadDocument = () => {
-    if (rfp?.documentUrl) {
-      window.open(rfp.documentUrl, '_blank');
-    } else {
-      alert('RFP document is not available for download at this time. Please contact the organization for more information.');
-    }
+    setDocumentDialogOpen(true);
   };
 
   const handleVisitWebsite = () => {
-    if (rfp?.organizationWebsite) {
-      window.open(rfp.organizationWebsite, '_blank');
-    } else {
-      alert('Organization website is not available. Please contact them directly for more information.');
-    }
+    setWebsiteDialogOpen(true);
   };
 
   const handleContactInfo = () => {
-    if (rfp?.contactEmail) {
-      const subject = encodeURIComponent(`Inquiry about RFP: ${rfp.title}`);
-      const body = encodeURIComponent(`Hello,
-
-I am interested in the RFP "${rfp.title}" and would like to get more information about the project requirements and submission process.
-
-Organization: ${rfp.organization}
-Technology: ${rfp.technology}
-Deadline: ${formatDate(rfp.deadline)}
-
-Please provide additional details or clarification as needed.
-
-Best regards`);
-      window.location.href = `mailto:${rfp.contactEmail}?subject=${subject}&body=${body}`;
-    } else {
-      alert(`Contact information for ${rfp?.organization}:
-
-Organization: ${rfp?.organization}
-Location: ${rfp?.location}
-Type: ${rfp?.organizationType}
-
-Please reach out to them directly for contact details.`);
-    }
+    setContactDialogOpen(true);
   };
 
   const getDeadlineColor = (daysUntil: number) => {
@@ -224,29 +199,152 @@ Please reach out to them directly for contact details.`);
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button 
-              onClick={handleDownloadDocument}
-              className="bg-brand-orange text-white hover:bg-brand-orange/90 flex-1"
-            >
-              <FileText className="w-4 h-4 mr-2" />
-              Download RFP Document
-            </Button>
-            <Button 
-              onClick={handleVisitWebsite}
-              variant="outline" 
-              className="border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white"
-            >
-              <Globe className="w-4 h-4 mr-2" />
-              Visit Organization Website
-            </Button>
-            <Button 
-              onClick={handleContactInfo}
-              variant="outline" 
-              className="border-gray-300"
-            >
-              <Users className="w-4 h-4 mr-2" />
-              Contact Information
-            </Button>
+            <Dialog open={documentDialogOpen} onOpenChange={setDocumentDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-brand-orange text-white hover:bg-brand-orange/90 flex-1">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Download RFP Document
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center">
+                    <Download className="w-5 h-5 mr-2" />
+                    RFP Document Download
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-lg mb-2">{rfp?.title}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div><span className="font-medium">Organization:</span> {rfp?.organization}</div>
+                      <div><span className="font-medium">Technology:</span> {rfp?.technology}</div>
+                      <div><span className="font-medium">Budget:</span> {formatBudget(rfp?.budgetMin, rfp?.budgetMax)}</div>
+                      <div><span className="font-medium">Deadline:</span> {rfp && formatDate(rfp.deadline)}</div>
+                    </div>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-blue-800 font-medium mb-2">Demo Application Note</p>
+                    <p className="text-blue-700 text-sm">
+                      This is a demonstration of the TechRFP Finder platform. In a production environment, 
+                      clicking this button would download the official RFP document PDF containing detailed 
+                      requirements, submission guidelines, and technical specifications.
+                    </p>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <p><span className="font-medium">Document URL:</span> {rfp?.documentUrl}</p>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={websiteDialogOpen} onOpenChange={setWebsiteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white">
+                  <Globe className="w-4 h-4 mr-2" />
+                  Visit Organization Website
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center">
+                    <ExternalLink className="w-5 h-5 mr-2" />
+                    Organization Website
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-lg mb-3">{rfp?.organization}</h3>
+                    <div className="space-y-2 text-sm">
+                      <div><span className="font-medium">Location:</span> {rfp?.location}</div>
+                      <div><span className="font-medium">Type:</span> {rfp?.organizationType}</div>
+                      {rfp?.contactEmail && (
+                        <div><span className="font-medium">Email:</span> {rfp.contactEmail}</div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-blue-800 font-medium mb-2">Demo Application Note</p>
+                    <p className="text-blue-700 text-sm">
+                      In a production environment, this would redirect you to the organization's 
+                      official website where you can learn more about their mission, current projects, 
+                      and procurement processes.
+                    </p>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <p><span className="font-medium">Website:</span> {rfp?.organizationWebsite}</p>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={contactDialogOpen} onOpenChange={setContactDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="border-gray-300">
+                  <Users className="w-4 h-4 mr-2" />
+                  Contact Information
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center">
+                    <Mail className="w-5 h-5 mr-2" />
+                    Contact Information
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-lg mb-3">{rfp?.organization}</h3>
+                    <div className="space-y-2">
+                      <div><span className="font-medium">Location:</span> {rfp?.location}</div>
+                      <div><span className="font-medium">Organization Type:</span> {rfp?.organizationType}</div>
+                      {rfp?.contactEmail && (
+                        <div className="flex items-center">
+                          <span className="font-medium mr-2">Email:</span>
+                          <a 
+                            href={`mailto:${rfp.contactEmail}?subject=${encodeURIComponent(`Inquiry about RFP: ${rfp.title}`)}`}
+                            className="text-brand-teal hover:underline"
+                          >
+                            {rfp.contactEmail}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-green-800 font-medium mb-2">Ready to Apply?</p>
+                    <p className="text-green-700 text-sm mb-3">
+                      Contact the organization directly to express your interest and get additional 
+                      information about the RFP requirements and submission process.
+                    </p>
+                    {rfp?.contactEmail && (
+                      <Button 
+                        onClick={() => {
+                          const subject = encodeURIComponent(`Inquiry about RFP: ${rfp.title}`);
+                          const body = encodeURIComponent(`Hello,
+
+I am interested in the RFP "${rfp.title}" and would like to get more information about the project requirements and submission process.
+
+Organization: ${rfp.organization}
+Technology: ${rfp.technology}
+Deadline: ${formatDate(rfp.deadline)}
+
+Please provide additional details or clarification as needed.
+
+Best regards`);
+                          window.location.href = `mailto:${rfp.contactEmail}?subject=${subject}&body=${body}`;
+                        }}
+                        className="bg-green-600 text-white hover:bg-green-700"
+                        size="sm"
+                      >
+                        <Mail className="w-4 h-4 mr-2" />
+                        Send Inquiry Email
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
