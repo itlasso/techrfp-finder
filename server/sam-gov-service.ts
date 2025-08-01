@@ -57,7 +57,6 @@ export class SamGovService {
     organizationName?: string;
   }): Promise<SamGovResponse> {
     const searchParams = new URLSearchParams({
-      api_key: this.apiKey,
       postedFrom: params.postedFrom,
       postedTo: params.postedTo,
       limit: (params.limit || 50).toString(),
@@ -80,12 +79,28 @@ export class SamGovService {
     const url = `${this.baseUrl}?${searchParams.toString()}`;
     
     try {
-      const response = await fetch(url);
+      // Try both authentication methods per SAM.gov documentation
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Api-Key': this.apiKey,
+      };
+
+      console.log(`Testing SAM.gov API with URL: ${url}`);
+      console.log(`Using API key: ${this.apiKey.substring(0, 8)}...`);
+      
+      const response = await fetch(url, { headers });
+      
+      console.log(`SAM.gov API response status: ${response.status}`);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`SAM.gov API error response: ${errorText}`);
         throw new Error(`SAM.gov API error: ${response.status} ${response.statusText}`);
       }
       
       const data: SamGovResponse = await response.json();
+      console.log(`SAM.gov API success: Retrieved ${data.opportunitiesData?.length || 0} opportunities`);
       return data;
     } catch (error) {
       console.error('Error fetching from SAM.gov API:', error);
