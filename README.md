@@ -33,7 +33,20 @@ A web application for discovering and browsing technology Request for Proposal (
 - Node.js 20 or higher
 - npm or yarn package manager
 
-### Step 1: Clone the Repository
+### Option 1: Download ZIP File
+
+1. **Download the complete application:**
+   - Go to https://github.com/itlasso/techrfp-finder
+   - Click the green "Code" button
+   - Select "Download ZIP"
+   - Extract the ZIP file to your desired location
+
+2. **Navigate to the project folder:**
+```bash
+cd techrfp-finder-main
+```
+
+### Option 2: Clone the Repository
 
 ```bash
 git clone https://github.com/itlasso/techrfp-finder.git
