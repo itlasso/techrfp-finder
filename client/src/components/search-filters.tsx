@@ -152,8 +152,8 @@ export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
         <button 
           onClick={() => {
             setSelectedTechnologies([]);
-            setDeadlineFilter("all");
-            setBudgetRange("any");
+            setDeadlineFilter("");
+            setBudgetRange("");
             setOrganizationTypes([]);
           }}
           className="w-full bg-brand-teal text-white py-2 px-4 rounded-lg hover:bg-brand-teal transition-colors font-medium"
