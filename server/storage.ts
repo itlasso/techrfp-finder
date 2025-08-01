@@ -22,27 +22,35 @@ export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private rfps: Map<string, Rfp>;
   private samGovService: SamGovService | null;
+  private apiKey: string | null;
 
   constructor() {
     this.users = new Map();
     this.rfps = new Map();
     
     // Initialize SAM.gov service if API key is available
-    const apiKey = process.env.SAM_GOV_API_KEY;
-    this.samGovService = apiKey ? new SamGovService(apiKey) : null;
+    this.apiKey = process.env.SAM_GOV_API_KEY || 'apbgf5Mx5PMy5ONi8UqMwo8NB6jNua8EyQSIzHac';
+    this.samGovService = this.apiKey ? new SamGovService(this.apiKey) : null;
     
     this.initializeRfps();
   }
 
   private initializeRfps() {
+    console.log('Initializing RFP data...');
+    console.log('SAM.gov service available:', !!this.samGovService);
+    console.log('API key configured:', !!this.apiKey);
+    
     // Start with immediate demo data, then load real data asynchronously
     this.seedDemoRfps();
     
     if (this.samGovService) {
+      console.log('Starting real RFP data loading...');
       // Load real data in background and replace demo data when available
       this.loadRealRfps().catch(error => {
         console.error('Failed to load real RFP data, continuing with demo data:', error);
       });
+    } else {
+      console.log('SAM.gov service not available, using demo data only');
     }
   }
 
@@ -129,8 +137,18 @@ export class MemStorage implements IStorage {
       console.error('Error loading real RFP data:', error);
       if (error instanceof Error) {
         console.error('Error details:', error.message);
+        
+        // Provide specific guidance based on error type
+        if (error.message.includes('403')) {
+          console.log('API access issue detected. The SAM.gov API key may need renewal or additional permissions.');
+          console.log('Contact SAM.gov support for API access verification.');
+        } else if (error.message.includes('401')) {
+          console.log('Authentication failed. Please verify the SAM.gov API key is correct.');
+        } else if (error.message.includes('rate limit')) {
+          console.log('API rate limit reached. Will retry later with exponential backoff.');
+        }
       }
-      console.log('Continuing with demo data for demonstration purposes...');
+      console.log('Using professional demo data while API access is resolved...');
     }
   }
 
