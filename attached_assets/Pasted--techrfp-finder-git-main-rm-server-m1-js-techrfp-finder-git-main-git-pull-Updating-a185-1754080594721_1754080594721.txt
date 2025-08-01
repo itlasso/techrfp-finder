@@ -1,0 +1,31 @@
+➜  techrfp-finder git:(main) ✗ rm server-m1.js
+➜  techrfp-finder git:(main) ✗ git pull
+Updating a185378..add294b
+Fast-forward
+ .env.example                                                   |  10 +
+ .replit                                                        |   1 +
+ README-M1.md                                                   |  59 ++++++
+ README.md                                                      | 272 ++++++----------------------
+ ...Apple-Silicon-support-brew--1754068243685_1754068243685.txt |  64 +++++++
+ ...warn-Unknown-user-config-no-1754067910041_1754067910041.txt |  71 ++++++++
+ ...chRFP-Finder-on-Apple-Silic-1754068773483_1754068773484.txt |  45 +++++
+ package-mac.json                                               |  14 ++
+ server-m1.js                                                   |  93 ++++++++++
+ server-simple.js                                               |  51 ++++++
+ server/index.ts                                                |  23 ++-
+ start-local.sh                                                 |  17 ++
+ 12 files changed, 501 insertions(+), 219 deletions(-)
+ create mode 100644 .env.example
+ create mode 100644 README-M1.md
+ create mode 100644 attached_assets/Pasted--techrfp-finder-git-main-Install-Node-js-20-LTS-which-has-better-Apple-Silicon-support-brew--1754068243685_1754068243685.txt
+ create mode 100644 attached_assets/Pasted--techrfp-finder-git-main-PORT-3000-HOST-localhost-npm-run-dev-npm-warn-Unknown-user-config-no-1754067910041_1754067910041.txt
+ create mode 100644 attached_assets/Pasted--techrfp-finder-git-main-PORT-3000-node-server-m1-js-Starting-TechRFP-Finder-on-Apple-Silic-1754068773483_1754068773484.txt
+ create mode 100644 package-mac.json
+ create mode 100644 server-m1.js
+ create mode 100644 server-simple.js
+ create mode 100644 start-local.sh
+➜  techrfp-finder git:(main) ✗ git reset --hard HEAD
+git pull
+HEAD is now at add294b Notify users about API key issues and switch to demo data temporarily
+Already up to date.
+➜  techrfp-finder git:(main)
