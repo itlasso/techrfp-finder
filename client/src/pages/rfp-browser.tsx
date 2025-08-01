@@ -13,12 +13,15 @@ import type { Rfp } from "@shared/schema";
 export default function RfpBrowser() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("deadline");
+  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
     technologies: [] as string[],
     deadlineFilter: "",
     budgetRange: "",
     organizationTypes: [] as string[],
   });
+
+  const ITEMS_PER_PAGE = 3;
 
   const queryParams = useMemo(() => {
     const params = new URLSearchParams();
@@ -62,6 +65,19 @@ export default function RfpBrowser() {
       }
     });
   }, [rfps, sortBy]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(sortedRfps.length / ITEMS_PER_PAGE);
+  const paginatedRfps = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return sortedRfps.slice(startIndex, endIndex);
+  }, [sortedRfps, currentPage]);
+
+  // Reset to page 1 when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filters, sortBy]);
 
   if (error) {
     return (
@@ -120,7 +136,7 @@ export default function RfpBrowser() {
               <div>
                 <h3 className="text-xl font-semibold text-black">Search Results</h3>
                 <p className="text-gray-600">
-                  {isLoading ? "Loading..." : `Found ${sortedRfps.length} open RFPs`}
+                  {isLoading ? "Loading..." : `Found ${sortedRfps.length} open RFPs${totalPages > 1 ? ` (Page ${currentPage} of ${totalPages})` : ''}`}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
@@ -154,27 +170,66 @@ export default function RfpBrowser() {
             )}
 
             {/* RFP Cards */}
-            {!isLoading && sortedRfps.length > 0 && (
+            {!isLoading && paginatedRfps.length > 0 && (
               <div className="space-y-6">
-                {sortedRfps.map((rfp) => (
+                {paginatedRfps.map((rfp) => (
                   <RfpCard key={rfp.id} rfp={rfp} />
                 ))}
               </div>
             )}
 
             {/* Pagination */}
-            {!isLoading && sortedRfps.length > 0 && (
+            {!isLoading && sortedRfps.length > 0 && totalPages > 1 && (
               <div className="flex justify-center mt-12">
                 <nav className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm" className="text-gray-500 hover:text-brand-orange">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-gray-500 hover:text-brand-orange"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                  >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <Button className="bg-brand-orange text-white">1</Button>
-                  <Button variant="ghost" className="text-gray-700 hover:text-brand-orange">2</Button>
-                  <Button variant="ghost" className="text-gray-700 hover:text-brand-orange">3</Button>
-                  <span className="px-3 py-2 text-gray-500">...</span>
-                  <Button variant="ghost" className="text-gray-700 hover:text-brand-orange">12</Button>
-                  <Button variant="ghost" size="sm" className="text-gray-500 hover:text-brand-orange">
+                  
+                  {/* Page Numbers */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    // Show first page, last page, current page, and pages around current
+                    const shouldShow = 
+                      page === 1 || 
+                      page === totalPages || 
+                      Math.abs(page - currentPage) <= 1;
+                    
+                    if (!shouldShow) {
+                      // Show ellipsis if there's a gap
+                      if (page === 2 && currentPage > 4) {
+                        return <span key={page} className="px-3 py-2 text-gray-500">...</span>;
+                      }
+                      if (page === totalPages - 1 && currentPage < totalPages - 3) {
+                        return <span key={page} className="px-3 py-2 text-gray-500">...</span>;
+                      }
+                      return null;
+                    }
+                    
+                    return (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "ghost"}
+                        className={currentPage === page ? "bg-brand-orange text-white" : "text-gray-700 hover:text-brand-orange"}
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </Button>
+                    );
+                  })}
+                  
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-gray-500 hover:text-brand-orange"
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                  >
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </nav>
