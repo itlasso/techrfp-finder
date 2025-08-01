@@ -16,6 +16,8 @@ export const rfps = pgTable("rfps", {
   location: text("location").notNull(),
   organizationType: text("organization_type").notNull(),
   contactEmail: text("contact_email"),
+  organizationWebsite: text("organization_website"),
+  documentUrl: text("document_url"),
   isDrupal: boolean("is_drupal").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
 });

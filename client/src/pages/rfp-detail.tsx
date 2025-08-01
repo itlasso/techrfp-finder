@@ -61,6 +61,48 @@ export default function RfpDetail() {
     }
   };
 
+  const handleDownloadDocument = () => {
+    if (rfp?.documentUrl) {
+      window.open(rfp.documentUrl, '_blank');
+    } else {
+      alert('RFP document is not available for download at this time. Please contact the organization for more information.');
+    }
+  };
+
+  const handleVisitWebsite = () => {
+    if (rfp?.organizationWebsite) {
+      window.open(rfp.organizationWebsite, '_blank');
+    } else {
+      alert('Organization website is not available. Please contact them directly for more information.');
+    }
+  };
+
+  const handleContactInfo = () => {
+    if (rfp?.contactEmail) {
+      const subject = encodeURIComponent(`Inquiry about RFP: ${rfp.title}`);
+      const body = encodeURIComponent(`Hello,
+
+I am interested in the RFP "${rfp.title}" and would like to get more information about the project requirements and submission process.
+
+Organization: ${rfp.organization}
+Technology: ${rfp.technology}
+Deadline: ${formatDate(rfp.deadline)}
+
+Please provide additional details or clarification as needed.
+
+Best regards`);
+      window.location.href = `mailto:${rfp.contactEmail}?subject=${subject}&body=${body}`;
+    } else {
+      alert(`Contact information for ${rfp?.organization}:
+
+Organization: ${rfp?.organization}
+Location: ${rfp?.location}
+Type: ${rfp?.organizationType}
+
+Please reach out to them directly for contact details.`);
+    }
+  };
+
   const getDeadlineColor = (daysUntil: number) => {
     if (daysUntil <= 7) return "bg-red-100 text-red-800";
     if (daysUntil <= 14) return "bg-yellow-100 text-yellow-800";
@@ -182,15 +224,26 @@ export default function RfpDetail() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="bg-brand-orange text-white hover:bg-brand-orange flex-1">
+            <Button 
+              onClick={handleDownloadDocument}
+              className="bg-brand-orange text-white hover:bg-brand-orange/90 flex-1"
+            >
               <FileText className="w-4 h-4 mr-2" />
               Download RFP Document
             </Button>
-            <Button variant="outline" className="border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white">
+            <Button 
+              onClick={handleVisitWebsite}
+              variant="outline" 
+              className="border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white"
+            >
               <Globe className="w-4 h-4 mr-2" />
               Visit Organization Website
             </Button>
-            <Button variant="outline" className="border-gray-300">
+            <Button 
+              onClick={handleContactInfo}
+              variant="outline" 
+              className="border-gray-300"
+            >
               <Users className="w-4 h-4 mr-2" />
               Contact Information
             </Button>
@@ -237,6 +290,18 @@ export default function RfpDetail() {
               <h3 className="font-semibold text-black mb-2">Organization Contact</h3>
               <p className="text-gray-700">{rfp.organization}</p>
               <p className="text-gray-600">{rfp.location}</p>
+              {rfp.contactEmail && (
+                <p className="text-brand-teal font-medium mt-1">
+                  Email: {rfp.contactEmail}
+                </p>
+              )}
+              {rfp.organizationWebsite && (
+                <p className="text-brand-teal font-medium">
+                  Website: <a href={rfp.organizationWebsite} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    {rfp.organizationWebsite.replace('https://', '').replace('http://', '')}
+                  </a>
+                </p>
+              )}
             </div>
             
             <div>
