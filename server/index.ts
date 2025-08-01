@@ -61,12 +61,9 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  const host = '127.0.0.1'; // Force localhost for macOS compatibility
   
-  console.log(`Attempting to start server on ${host}:${port}`);
-  
-  // Use simpler listen call for better macOS compatibility
-  server.listen(port, host, () => {
-    log(`✅ Server successfully started on ${host}:${port}`);
+  // macOS compatibility: Use 127.0.0.1 instead of 0.0.0.0
+  server.listen(port, '127.0.0.1', () => {
+    log(`serving on 127.0.0.1:${port}`);
   });
 })();
