@@ -27,9 +27,9 @@ export class DatabaseStorage implements IStorage {
   private apiKey: string | null;
 
   constructor() {
-    // Initialize SAM.gov service with user's API key
-    this.apiKey = process.env.SAM_GOV_API_KEY || 'apbgf5Mx5PMy5ON18UqMwo8NB6jhua8EyQSIzHac';
-    this.samGovService = this.apiKey ? new SamGovService(this.apiKey) : null;
+    // Initialize SAM.gov service with authenticated API key
+    this.apiKey = 'apbgf5Mx5PMy5ON18UqMwo8NB6jhua8EyQSIzHac';
+    this.samGovService = new SamGovService(this.apiKey);
     
     this.initializeRfps();
   }

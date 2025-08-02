@@ -24,13 +24,20 @@ cd techrfp-finder
 npm install
 ```
 
-### 3. Start Development Server
+### 3. Start Development Server (Intel Mac)
 ```bash
-npm run dev
+# Method 1: Simple startup script (recommended)
+./start-local-simple.sh
+
+# Method 2: Intel-optimized script with process management
+./start-local-intel.sh
+
+# Method 3: Manual environment setup
+HOST=localhost PORT=5000 npm run dev
 ```
 
 ### 4. Access Application
-- Primary: http://localhost:5000
+- Primary: http://localhost:5000 (links work properly)
 - Alternative: http://127.0.0.1:5000
 
 ## Intel-Specific Optimizations
@@ -68,6 +75,7 @@ npm install
 **Network Access:**
 - Application accessible at localhost:5000
 - Intel Macs typically have no networking issues with Node.js
+- Clear browser cache if RFP links show 404 errors (Cmd+Shift+R)
 - Firewall settings may need adjustment for external access
 
 ## Production Features Available
@@ -79,7 +87,8 @@ npm install
 
 ## Development Commands
 ```bash
-npm run dev          # Start development server
+./start-local-intel.sh   # Start Intel Mac optimized server (recommended)
+HOST=localhost npm run dev   # Alternative local development
 npm run build        # Build for production
 npm run db:push      # Deploy database schema
 npm start            # Start production server

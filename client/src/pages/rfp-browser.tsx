@@ -40,11 +40,18 @@ export default function RfpBrowser() {
   const { data: rfps, isLoading, error } = useQuery<Rfp[]>({
     queryKey: ["/api/rfps", queryParams],
     queryFn: async () => {
-      const response = await fetch(`/api/rfps?${queryParams}`);
+      const url = queryParams ? `/api/rfps?${queryParams}` : '/api/rfps';
+      console.log('Frontend: Fetching from', url);
+      const response = await fetch(url);
       if (!response.ok) {
-        throw new Error("Failed to fetch RFPs");
+        console.error('Frontend: Fetch failed', response.status);
+        throw new Error(`Failed to fetch RFPs: ${response.status}`);
       }
-      return response.json();
+      const data = await response.json();
+      console.log('Frontend: Received data', data);
+      console.log('Frontend: Data length', data.length);
+      console.log('Frontend: First RFP', data[0]?.title);
+      return data;
     },
   });
 
@@ -169,11 +176,29 @@ export default function RfpBrowser() {
               </div>
             )}
 
+
+
+            {/* Debug Section */}
+            <div className="mb-4 p-4 bg-yellow-100 border rounded">
+              <h3 className="font-bold">Debug Info:</h3>
+              <p>Loading: {isLoading.toString()}</p>
+              <p>Error: {error?.message || 'none'}</p>
+              <p>Raw RFPs count: {rfps?.length || 0}</p>
+              <p>Sorted RFPs count: {sortedRfps.length}</p>
+              <p>Paginated RFPs count: {paginatedRfps.length}</p>
+              <p>Current page: {currentPage}</p>
+            </div>
+
             {/* RFP Cards */}
             {!isLoading && paginatedRfps.length > 0 && (
               <div className="space-y-6">
                 {paginatedRfps.map((rfp) => (
-                  <RfpCard key={rfp.id} rfp={rfp} />
+                  <div key={rfp.id} className="border-2 border-red-500 p-4">
+                    <h3 className="text-lg font-bold">{rfp.title}</h3>
+                    <p>{rfp.organization}</p>
+                    <p>{rfp.technology}</p>
+                    <RfpCard rfp={rfp} />
+                  </div>
                 ))}
               </div>
             )}

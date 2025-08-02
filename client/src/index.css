@@ -73,6 +73,28 @@
     transform: translateY(-1px);
   }
 
+  .rfp-card {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .drupal-highlight {
+    border-left: 4px solid var(--brand-orange);
+  }
+
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .rfp-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);

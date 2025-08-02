@@ -40,7 +40,7 @@ export interface SamGovResponse {
 
 export class SamGovService {
   private readonly apiKey: string;
-  private readonly baseUrl = 'https://api.sam.gov/opportunities/v1/search';
+  private readonly baseUrl = 'https://api.sam.gov/prod/opportunities/v2/search';
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
@@ -58,9 +58,17 @@ export class SamGovService {
     const futureDate = new Date(today);
     futureDate.setDate(today.getDate() + 120);
 
+    // SAM.gov v2 API requires MM/dd/yyyy date format
+    const formatDate = (date: Date) => {
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${month}/${day}/${year}`;
+    };
+
     const searchParams = new URLSearchParams({
-      postedFrom: thirtyDaysAgo.toISOString().split('T')[0],
-      postedTo: futureDate.toISOString().split('T')[0],
+      postedFrom: formatDate(thirtyDaysAgo),
+      postedTo: formatDate(futureDate),
       limit: (params.limit || 50).toString(),
       offset: (params.offset || 0).toString(),
     });
@@ -70,14 +78,14 @@ export class SamGovService {
       searchParams.append('title', params.keywords.join(' OR '));
     }
 
+    // Add API key as required URL parameter for v2 API
+    searchParams.append('api_key', this.apiKey);
     const url = `${this.baseUrl}?${searchParams.toString()}`;
     
     try {
-      // Use correct SAM.gov API authentication with x-api-key header
       const headers: Record<string, string> = {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'x-api-key': this.apiKey,
+        'User-Agent': 'TechRFP-Finder/1.0',
       };
 
       console.log(`Testing SAM.gov API with URL: ${url}`);
@@ -126,9 +134,10 @@ export class SamGovService {
     // Create organization website from government domain
     const organizationWebsite = this.generateGovWebsite(opportunity.fullParentPathName);
     
-    // Generate document URL from resource links or UI link
-    const documentUrl = opportunity.resourceLinks?.[0] || opportunity.uiLink || 
-      `https://sam.gov/opp/${opportunity.noticeId}`;
+    // Generate authentic government document URL
+    const documentUrl = opportunity.uiLink || 
+      `https://sam.gov/opp/${opportunity.noticeId}/view` ||
+      opportunity.resourceLinks?.[0];
 
     return {
       title: opportunity.title,
