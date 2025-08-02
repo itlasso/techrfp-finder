@@ -30,7 +30,7 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    for (const user of this.users.values()) {
+    for (const user of Array.from(this.users.values())) {
       if (user.email === username) {
         return user;
       }
@@ -41,13 +41,12 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const user: User = {
       id: randomUUID(),
-      email: insertUser.email,
-      firstName: insertUser.firstName,
-      lastName: insertUser.lastName,
-      profileImageUrl: insertUser.profileImageUrl,
+      email: insertUser.email || null,
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
+      profileImageUrl: insertUser.profileImageUrl || null,
       createdAt: new Date(),
       updatedAt: new Date(),
-      ...insertUser,
     };
     this.users.set(user.id, user);
     return user;
@@ -60,6 +59,7 @@ export class MemStorage implements IStorage {
   async createRfp(insertRfp: InsertRfp): Promise<Rfp> {
     const rfp: Rfp = {
       id: randomUUID(),
+      postedDate: new Date(),
       ...insertRfp,
     };
     this.rfps.set(rfp.id, rfp);
