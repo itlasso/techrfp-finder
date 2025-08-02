@@ -41,26 +41,19 @@ export default function RfpBrowser() {
     queryKey: ["/api/rfps", queryParams],
     queryFn: async () => {
       const url = queryParams ? `/api/rfps?${queryParams}` : '/api/rfps';
-      console.log('Fetching RFPs from:', url);
       const response = await fetch(url);
       if (!response.ok) {
-        console.error('RFP fetch failed:', response.status, response.statusText);
         throw new Error(`Failed to fetch RFPs: ${response.status}`);
       }
       const data = await response.json();
-      console.log('RFPs received:', data.length, 'items');
       return data;
     },
   });
 
   const sortedRfps = useMemo(() => {
-    console.log('Sorting RFPs. Raw data:', rfps);
-    if (!rfps) {
-      console.log('No RFPs data available');
-      return [];
-    }
+    if (!rfps) return [];
     
-    const sorted = [...rfps].sort((a, b) => {
+    return [...rfps].sort((a, b) => {
       switch (sortBy) {
         case "budget":
           const aBudget = a.budgetMax || a.budgetMin || 0;
@@ -73,8 +66,6 @@ export default function RfpBrowser() {
           return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
       }
     });
-    console.log('Sorted RFPs:', sorted.length, 'items');
-    return sorted;
   }, [rfps, sortBy]);
 
   // Pagination logic
@@ -82,10 +73,7 @@ export default function RfpBrowser() {
   const paginatedRfps = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const paginated = sortedRfps.slice(startIndex, endIndex);
-    console.log('Paginated RFPs:', paginated.length, 'items for page', currentPage);
-    console.log('First RFP:', paginated[0]?.title);
-    return paginated;
+    return sortedRfps.slice(startIndex, endIndex);
   }, [sortedRfps, currentPage]);
 
   // Reset to page 1 when filters change
@@ -183,15 +171,7 @@ export default function RfpBrowser() {
               </div>
             )}
 
-            {/* Debug Info */}
-            {!isLoading && (
-              <div className="mb-4 p-4 bg-gray-100 rounded text-xs">
-                <strong>Debug:</strong> Loading: {isLoading.toString()}, 
-                Total RFPs: {sortedRfps.length}, 
-                Paginated: {paginatedRfps.length}, 
-                Page: {currentPage}/{totalPages}
-              </div>
-            )}
+
 
             {/* RFP Cards */}
             {!isLoading && paginatedRfps.length > 0 && (

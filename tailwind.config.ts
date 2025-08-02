@@ -51,6 +51,10 @@ export default {
           "4": "var(--chart-4)",
           "5": "var(--chart-5)",
         },
+        "brand-orange": "var(--brand-orange)",
+        "brand-teal": "var(--brand-teal)",
+        "brand-black": "var(--brand-black)",
+        "brand-white": "var(--brand-white)",
         sidebar: {
           DEFAULT: "var(--sidebar-background)",
           foreground: "var(--sidebar-foreground)",
