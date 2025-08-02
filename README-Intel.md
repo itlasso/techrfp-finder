@@ -26,10 +26,13 @@ npm install
 
 ### 3. Start Development Server (Intel Mac)
 ```bash
-# Method 1: Use Intel-optimized script (recommended)
+# Method 1: Simple startup script (recommended)
+./start-local-simple.sh
+
+# Method 2: Intel-optimized script with process management
 ./start-local-intel.sh
 
-# Method 2: Manual environment setup
+# Method 3: Manual environment setup
 HOST=localhost PORT=5000 npm run dev
 ```
 

@@ -35,6 +35,8 @@ The REST API provides endpoints for RFP operations including listing RFPs with f
 - **Professional Production Environment**: Removed all demo content - application displays only real government opportunities
 - **Successful Deployment**: Application confirmed working in browser with live professional RFP data
 - **Server Configuration**: Optimized host binding (0.0.0.0:5000) for universal access across development environments
+- **Hyperlink Resolution**: Fixed document endpoint routing issue - all RFP document links now work properly on both Replit and local Intel Mac environments
+- **Local Development Scripts**: Created Intel Mac-specific startup scripts with proper localhost binding and troubleshooting documentation
 
 ## External Dependencies
 
