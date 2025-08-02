@@ -37,6 +37,7 @@ The REST API provides endpoints for RFP operations including listing RFPs with f
 - **Server Configuration**: Optimized host binding (0.0.0.0:5000) for universal access across development environments
 - **Hyperlink Resolution**: Fixed document endpoint routing issue - all RFP document links now work properly on both Replit and local Intel Mac environments
 - **Local Development Scripts**: Created Intel Mac-specific startup scripts with proper localhost binding and troubleshooting documentation
+- **Cross-Platform Development**: Replit environment fully operational with live data - Intel Mac local development in progress with IPv4/IPv6 connectivity troubleshooting
 
 ## External Dependencies
 
