@@ -1,166 +1,144 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sliders } from "lucide-react";
-
-interface SearchFiltersProps {
-  onFiltersChange: (filters: {
-    technologies: string[];
-    deadlineFilter: string;
-    budgetRange: string;
-    organizationTypes: string[];
-  }) => void;
+import { Rfp } from "@shared/schema";
+interface IStorage {
+  getRfps(filters?: {
+    search?: string;
+    technologies?: string[];
+    deadlineFilter?: string;
+    budgetRange?: string;
+    organizationTypes?: string[];
+  }): Promise<Rfp[]>;
+  getRfp(id: string): Promise<Rfp | undefined>;
+  createRfp(rfp: Rfp): Promise<Rfp>;
 }
-
-export function SearchFilters({ onFiltersChange }: SearchFiltersProps) {
-  const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>([]);
-  const [deadlineFilter, setDeadlineFilter] = useState<string>("");
-  const [budgetRange, setBudgetRange] = useState<string>("");
-  const [organizationTypes, setOrganizationTypes] = useState<string[]>([]);
-
-  const { data: techCounts } = useQuery<Record<string, number>>({
-    queryKey: ["/api/rfps/stats/technologies"],
-  });
-
-  useEffect(() => {
-    onFiltersChange({
-      technologies: selectedTechnologies,
-      deadlineFilter,
-      budgetRange,
-      organizationTypes,
+export class LocalStorage implements IStorage {
+  private rfps: Map<string, Rfp> = new Map();
+  constructor() {
+    this.initializeRfps();
+  }
+  async getRfp(id: string): Promise<Rfp | undefined> {
+    return this.rfps.get(id);
+  }
+  async createRfp(rfp: Rfp): Promise<Rfp> {
+    this.rfps.set(rfp.id, rfp);
+    return rfp;
+  }
+  async getRfps(filters?: {
+    search?: string;
+    technologies?: string[];
+    deadlineFilter?: string;
+    budgetRange?: string;
+    organizationTypes?: string[];
+  }): Promise<Rfp[]> {
+    let rfps = Array.from(this.rfps.values());
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      rfps = rfps.filter(rfp => 
+        rfp.title.toLowerCase().includes(searchLower) ||
+        rfp.description.toLowerCase().includes(searchLower) ||
+        rfp.organization.toLowerCase().includes(searchLower)
+      );
+    }
+    if (filters?.technologies?.length) {
+      rfps = rfps.filter(rfp => filters.technologies!.includes(rfp.technology));
+    }
+    if (filters?.organizationTypes?.length) {
+      rfps = rfps.filter(rfp => filters.organizationTypes!.includes(rfp.organizationType));
+    }
+    if (filters?.budgetRange && filters.budgetRange !== "any") {
+      const [min, max] = filters.budgetRange.split('-').map(Number);
+      rfps = rfps.filter(rfp => {
+        if (!rfp.budgetMin) return true;
+        return rfp.budgetMin >= min && (max ? rfp.budgetMax && rfp.budgetMax <= max : true);
+      });
+    }
+    if (filters?.deadlineFilter && filters.deadlineFilter !== "all") {
+      const now = new Date();
+      const filterDays = parseInt(filters.deadlineFilter);
+      const filterDate = new Date(now.getTime() + filterDays * 24 * 60 * 60 * 1000);
+      
+      rfps = rfps.filter(rfp => new Date(rfp.deadline) <= filterDate);
+    }
+    return rfps.sort((a, b) => {
+      // Prioritize Drupal RFPs
+      if (a.isDrupal && !b.isDrupal) return -1;
+      if (!a.isDrupal && b.isDrupal) return 1;
+      
+      // Then sort by deadline
+      return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
     });
-  }, [selectedTechnologies, deadlineFilter, budgetRange, organizationTypes, onFiltersChange]);
-
-  const handleTechnologyChange = (technology: string, checked: boolean) => {
-    if (checked) {
-      setSelectedTechnologies([...selectedTechnologies, technology]);
-    } else {
-      setSelectedTechnologies(selectedTechnologies.filter(t => t !== technology));
+  }
+  private async initializeRfps() {
+    console.log('Initializing professional RFP data for local development...');
+    
+    // Professional RFP data with working hyperlinks
+    const professionalRfps: Rfp[] = [
+      {
+        id: "a7dbc4d2-d166-4a3a-9882-0c656b3cce7f",
+        title: "University Research Platform Development",
+        organization: "State University System",
+        description: "Development of comprehensive research collaboration platform with grant management, publication tracking, and inter-institutional collaboration tools.",
+        technology: "Drupal",
+        budgetMin: 300000 as number | null,
+        budgetMax: 400000 as number | null,
+        deadline: new Date("2025-10-15"),
+        postedDate: new Date(),
+        location: "New York",
+        organizationType: "Education",
+        contactEmail: "research-it@stateuniv.edu",
+        organizationWebsite: "https://stateuniv.edu",
+        documentUrl: "/api/rfps/university-research/document",
+        isDrupal: true,
+        isActive: true
+      },
+      {
+        id: "fcf0a793-9117-49ea-99fd-a39d9ad766e7",
+        title: "Municipal Government Portal Modernization",
+        organization: "City of Innovation",
+        description: "Complete overhaul of city government website with citizen services portal, online permit applications, and integrated payment processing system.",
+        technology: "WordPress",
+        budgetMin: 180000 as number | null,
+        budgetMax: 220000 as number | null,
+        deadline: new Date("2025-08-30"),
+        postedDate: new Date(),
+        location: "Texas",
+        organizationType: "Government",
+        contactEmail: "webmaster@cityofinnovation.gov",
+        organizationWebsite: "https://cityofinnovation.gov",
+        documentUrl: "/api/rfps/municipal-portal/document",
+        isDrupal: false,
+        isActive: true
+      },
+      {
+        id: "cf973054-4f89-48af-bcc3-f35acf9c8616",
+        title: "Healthcare Data Management System",
+        organization: "Regional Medical Alliance",
+        description: "Implementation of secure, HIPAA-compliant data management platform for multi-facility healthcare network with patient portal and provider collaboration tools.",
+        technology: "Drupal",
+        budgetMin: 450000 as number | null,
+        budgetMax: 580000 as number | null,
+        deadline: new Date("2025-12-01"),
+        postedDate: new Date(),
+        location: "California",
+        organizationType: "Non-profit",
+        contactEmail: "procurement@medalliance.org",
+        organizationWebsite: "https://regionalmedical.org",
+        documentUrl: "/api/rfps/healthcare-data/document",
+        isDrupal: true,
+        isActive: true
+      }
+    ];
+    for (const rfp of professionalRfps) {
+      this.rfps.set(rfp.id, rfp);
     }
-  };
-
-  const handleOrganizationTypeChange = (orgType: string, checked: boolean) => {
-    if (checked) {
-      setOrganizationTypes([...organizationTypes, orgType]);
-    } else {
-      setOrganizationTypes(organizationTypes.filter(t => t !== orgType));
+    console.log('Successfully loaded 3 professional RFP opportunities');
+    console.log('RFP titles:', professionalRfps.map(rfp => rfp.title));
+  }
+  getTechnologyCounts(): Record<string, number> {
+    const counts: Record<string, number> = {};
+    for (const rfp of this.rfps.values()) {
+      counts[rfp.technology] = (counts[rfp.technology] || 0) + 1;
     }
-  };
-
-  const technologies = [
-    { name: "Drupal", count: techCounts?.["Drupal"] || 0 },
-    { name: "WordPress", count: techCounts?.["WordPress"] || 0 },
-    { name: "React", count: techCounts?.["React"] || 0 },
-    { name: "Angular", count: techCounts?.["Angular"] || 0 },
-    { name: "Node.js", count: techCounts?.["Node.js"] || 0 },
-    { name: "Python", count: techCounts?.["Python"] || 0 },
-  ];
-
-  const orgTypes = ["Government", "Non-profit", "Education", "Private"];
-
-  return (
-    <aside className="lg:w-80 flex-shrink-0">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-4">
-        <h3 className="text-lg font-semibold text-black mb-4 flex items-center">
-          <Sliders className="text-brand-teal mr-2" />
-          Filter RFPs
-        </h3>
-        
-        {/* Technology Type Filter */}
-        <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Technology Type</h4>
-          <div className="space-y-2">
-            {technologies.map((tech) => (
-              <div key={tech.name} className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id={tech.name}
-                    checked={selectedTechnologies.includes(tech.name)}
-                    onCheckedChange={(checked) => 
-                      handleTechnologyChange(tech.name, !!checked)
-                    }
-                  />
-                  <label htmlFor={tech.name} className="text-sm text-gray-700 cursor-pointer">
-                    {tech.name}
-                  </label>
-                </div>
-                <span className={`text-xs px-2 py-1 rounded-full text-white ${
-                  tech.name === "Drupal" ? "bg-brand-orange" : "bg-gray-500"
-                }`}>
-                  {tech.count}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Deadline Filter */}
-        <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Deadline</h4>
-          <Select value={deadlineFilter} onValueChange={setDeadlineFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="All deadlines" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All deadlines</SelectItem>
-              <SelectItem value="7">Next 7 days</SelectItem>
-              <SelectItem value="30">Next 30 days</SelectItem>
-              <SelectItem value="90">Next 3 months</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Budget Range */}
-        <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Budget Range</h4>
-          <Select value={budgetRange} onValueChange={setBudgetRange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Any budget" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="any">Any budget</SelectItem>
-              <SelectItem value="0-50000">Under $50K</SelectItem>
-              <SelectItem value="50000-100000">$50K - $100K</SelectItem>
-              <SelectItem value="100000-500000">$100K - $500K</SelectItem>
-              <SelectItem value="500000+">$500K+</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Organization Type */}
-        <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Organization Type</h4>
-          <div className="space-y-2">
-            {orgTypes.map((orgType) => (
-              <div key={orgType} className="flex items-center space-x-2">
-                <Checkbox
-                  id={orgType}
-                  checked={organizationTypes.includes(orgType)}
-                  onCheckedChange={(checked) => 
-                    handleOrganizationTypeChange(orgType, !!checked)
-                  }
-                />
-                <label htmlFor={orgType} className="text-sm text-gray-700 cursor-pointer">
-                  {orgType}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <button 
-          onClick={() => {
-            setSelectedTechnologies([]);
-            setDeadlineFilter("");
-            setBudgetRange("");
-            setOrganizationTypes([]);
-          }}
-          className="w-full bg-brand-teal text-white py-2 px-4 rounded-lg hover:bg-brand-teal transition-colors font-medium"
-        >
-          Clear Filters
-        </button>
-      </div>
-    </aside>
-  );
+    return counts;
+  }
 }
+export const storage = new LocalStorage();
