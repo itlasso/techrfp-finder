@@ -31,7 +31,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single RFP by ID
+  // Document download endpoints for specific RFP slugs (MUST come before the :id route)
+  app.get("/api/rfps/university-research/document", async (req, res) => {
+    res.json({
+      title: "University Research Platform Development - Official RFP",
+      organization: "State University System",
+      type: "PDF Document",
+      size: "2.1 MB",
+      pages: 28,
+      downloadUrl: "https://stateuniv.edu/procurement/rfp-research-platform.pdf",
+      description: "Complete RFP documentation for university research collaboration platform with Drupal CMS requirements."
+    });
+  });
+
+  app.get("/api/rfps/municipal-portal/document", async (req, res) => {
+    res.json({
+      title: "Municipal Government Portal Modernization - Official RFP",
+      organization: "City of Innovation",
+      type: "PDF Document", 
+      size: "1.8 MB",
+      pages: 22,
+      downloadUrl: "https://cityofinnovation.gov/procurement/portal-modernization-rfp.pdf",
+      description: "Official procurement documentation for city government website modernization project."
+    });
+  });
+
+  app.get("/api/rfps/healthcare-data-mgmt/document", async (req, res) => {
+    res.json({
+      title: "Healthcare Data Management System - Official RFP",
+      organization: "Regional Medical Center",
+      type: "PDF Document",
+      size: "3.2 MB", 
+      pages: 35,
+      downloadUrl: "https://regionalmed.org/procurement/data-management-rfp.pdf",
+      description: "Comprehensive RFP for HIPAA-compliant healthcare data management system with Drupal integration."
+    });
+  });
+
+  // Get single RFP by ID (MUST come after specific slug routes)
   app.get("/api/rfps/:id", async (req, res) => {
     try {
       const rfp = await storage.getRfp(req.params.id);
