@@ -122,14 +122,9 @@ export class MemStorage implements IStorage {
     console.log('Fetching live government RFP data from SAM.gov...');
     
     try {
-      // Initialize SAM.gov service with user's API key
-      const apiKey = process.env.SAM_GOV_API_KEY || 'apbgf5Mx5PMy5ON18UqMwo8NB6jhua8EyQSIzHac';
-      if (!apiKey) {
-        console.log('⚠️ SAM_GOV_API_KEY not provided - unable to fetch live data');
-        return;
-      }
-      
-      console.log(`🔑 Using SAM.gov API key: ${apiKey.substring(0, 8)}...`);
+      // Initialize SAM.gov service with authenticated API key
+      const apiKey = 'apbgf5Mx5PMy5ON18UqMwo8NB6jhua8EyQSIzHac';
+      console.log(`Connecting to SAM.gov with authenticated API key: ${apiKey.substring(0, 8)}...`);
 
       const { SamGovService } = await import("./sam-gov-service");
       const samGovService = new SamGovService(apiKey);
