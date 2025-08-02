@@ -119,7 +119,7 @@ export class MemStorage implements IStorage {
   }
 
   private async initializeRfps() {
-    console.log('Loading professional RFP data for Intel iMac...');
+    console.log('Loading professional RFP data...');
     
     // Professional RFP data with working hyperlinks
     const professionalRfps: Rfp[] = [

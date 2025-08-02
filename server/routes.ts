@@ -5,9 +5,13 @@ import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Use local storage for development without database dependency
-  const storage = process.env.DATABASE_URL 
+  // Only use database storage in production environments with both DATABASE_URL and SAM_GOV_API_KEY
+  const useDatabase = process.env.DATABASE_URL && process.env.SAM_GOV_API_KEY;
+  const storage = useDatabase 
     ? (await import("./storage")).storage
     : localStorageModule;
+    
+  console.log(`Using ${useDatabase ? 'database' : 'local'} storage for RFP data`);
   // Get RFPs with optional filters
   app.get("/api/rfps", async (req, res) => {
     try {
