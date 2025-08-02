@@ -1,6 +1,10 @@
-import { type User, type InsertUser, type Rfp, type InsertRfp } from "@shared/schema";
+// This file is only used in production with DATABASE_URL
+// For local development, use storage-local.ts instead
+import { type User, type InsertUser, type Rfp, type InsertRfp, users, rfps, documentDownloads, rfpBookmarks, searchAnalytics } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { SamGovService } from "./sam-gov-service";
+import { db } from "./db";
+import { eq, desc, like, and, or, gte, lte, count } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;

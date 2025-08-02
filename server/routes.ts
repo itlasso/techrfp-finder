@@ -1,12 +1,13 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-// Use local storage for development without database dependency
-const storage = process.env.DATABASE_URL 
-  ? require("./storage").storage 
-  : require("./storage-local").storage;
+import { storage as localStorageModule } from "./storage-local";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Use local storage for development without database dependency
+  const storage = process.env.DATABASE_URL 
+    ? (await import("./storage")).storage
+    : localStorageModule;
   // Get RFPs with optional filters
   app.get("/api/rfps", async (req, res) => {
     try {
