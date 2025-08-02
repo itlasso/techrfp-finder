@@ -40,11 +40,16 @@ export default function RfpBrowser() {
   const { data: rfps, isLoading, error } = useQuery<Rfp[]>({
     queryKey: ["/api/rfps", queryParams],
     queryFn: async () => {
-      const response = await fetch(`/api/rfps?${queryParams}`);
+      const url = queryParams ? `/api/rfps?${queryParams}` : '/api/rfps';
+      console.log('Fetching RFPs from:', url);
+      const response = await fetch(url);
       if (!response.ok) {
-        throw new Error("Failed to fetch RFPs");
+        console.error('RFP fetch failed:', response.status, response.statusText);
+        throw new Error(`Failed to fetch RFPs: ${response.status}`);
       }
-      return response.json();
+      const data = await response.json();
+      console.log('RFPs received:', data.length, 'items');
+      return data;
     },
   });
 
