@@ -4,14 +4,9 @@ import { storage as localStorageModule } from "./storage-local";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Force local storage for development to ensure professional RFP data displays
-  // Database storage only for production deployments
-  const isProduction = process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT;
-  const storage = isProduction && process.env.DATABASE_URL 
-    ? (await import("./storage")).storage
-    : localStorageModule;
-    
-  console.log(`Using ${isProduction ? 'database' : 'local'} storage for RFP data`);
+  // Always use local storage for consistent development experience
+  const storage = localStorageModule;
+  console.log('Using local storage with professional RFP data');
   // Get RFPs with optional filters
   app.get("/api/rfps", async (req, res) => {
     try {

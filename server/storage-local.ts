@@ -119,7 +119,7 @@ export class MemStorage implements IStorage {
   }
 
   private async initializeRfps() {
-    console.log('Loading professional RFP data...');
+    console.log('Initializing professional RFP data for local development...');
     
     // Professional RFP data with working hyperlinks
     const professionalRfps: Rfp[] = [
@@ -179,11 +179,15 @@ export class MemStorage implements IStorage {
       }
     ];
 
+    // Clear existing data and load fresh professional RFPs
+    this.rfps.clear();
+    
     professionalRfps.forEach(rfp => {
       this.rfps.set(rfp.id, rfp);
     });
 
-    console.log(`Loaded ${professionalRfps.length} professional RFP opportunities`);
+    console.log(`Successfully loaded ${professionalRfps.length} professional RFP opportunities`);
+    console.log('RFP titles:', professionalRfps.map(rfp => rfp.title));
   }
 }
 
