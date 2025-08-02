@@ -47,33 +47,27 @@ export class SamGovService {
   }
 
   async searchOpportunities(params: {
-    title?: string;
-    postedFrom: string;
-    postedTo: string;
+    keywords?: string[];
     limit?: number;
     offset?: number;
-    state?: string;
-    ncode?: string; // NAICS code for technology filtering
-    organizationName?: string;
-  }): Promise<SamGovResponse> {
+  }): Promise<Rfp[]> {
+    // Set date range for recent opportunities (last 30 days to next 120 days)
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 120);
+
     const searchParams = new URLSearchParams({
-      postedFrom: params.postedFrom,
-      postedTo: params.postedTo,
+      postedFrom: thirtyDaysAgo.toISOString().split('T')[0],
+      postedTo: futureDate.toISOString().split('T')[0],
       limit: (params.limit || 50).toString(),
       offset: (params.offset || 0).toString(),
     });
 
-    if (params.title) {
-      searchParams.append('title', params.title);
-    }
-    if (params.state) {
-      searchParams.append('state', params.state);
-    }
-    if (params.ncode) {
-      searchParams.append('ncode', params.ncode);
-    }
-    if (params.organizationName) {
-      searchParams.append('organizationName', params.organizationName);
+    // Add technology-related keywords to find relevant opportunities
+    if (params.keywords?.length) {
+      searchParams.append('title', params.keywords.join(' OR '));
     }
 
     const url = `${this.baseUrl}?${searchParams.toString()}`;
@@ -101,7 +95,14 @@ export class SamGovService {
       
       const data: SamGovResponse = await response.json();
       console.log(`SAM.gov API success: Retrieved ${data.opportunitiesData?.length || 0} opportunities`);
-      return data;
+      
+      // Convert SAM.gov opportunities to our RFP format
+      const rfps: Rfp[] = data.opportunitiesData?.map(opp => ({
+        id: opp.noticeId,
+        ...this.convertToRfp(opp)
+      })) || [];
+      
+      return rfps;
     } catch (error) {
       console.error('Error fetching from SAM.gov API:', error);
       throw error;

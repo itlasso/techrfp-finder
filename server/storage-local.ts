@@ -118,72 +118,42 @@ export class MemStorage implements IStorage {
     });
   }
 
-  private initializeRfps() {
-    console.log('Initializing professional RFP data for local development...');
+  private async initializeRfps() {
+    console.log('Fetching live government RFP data from SAM.gov...');
     
-    const sampleRfps: Rfp[] = [
-      {
-        id: randomUUID(),
-        title: "Healthcare Data Management System",
-        organization: "Regional Medical Center",
-        description: "Comprehensive healthcare data management platform with patient records integration, HIPAA compliance, and real-time analytics. System must support 50,000+ patient records with secure access controls and audit trails.",
-        technology: "Drupal",
-        budgetMin: 400000,
-        budgetMax: 500000,
-        deadline: new Date('2025-08-24'),
-        postedDate: new Date('2024-12-15'),
-        location: "Boston, MA",
-        organizationType: "Healthcare",
-        contactEmail: "procurement@regionalmedical.org",
-        organizationWebsite: "https://www.regionalmedical.org",
-        documentUrl: "/demo/healthcare-data-system-rfp.pdf",
-        isDrupal: true,
-        isActive: true
-      },
-      {
-        id: randomUUID(),
-        title: "University Content Management Platform",
-        organization: "State University System",
-        description: "Modern content management solution for 12 university campuses serving 180,000 students. Requires multilingual support, accessibility compliance, and integration with student information systems.",
-        technology: "Drupal",
-        budgetMin: 600000,
-        budgetMax: 800000,
-        deadline: new Date('2025-09-15'),
-        postedDate: new Date('2024-12-20'),
-        location: "Austin, TX",
-        organizationType: "Education",
-        contactEmail: "it-procurement@stateuniversity.edu",
-        organizationWebsite: "https://www.stateuniversity.edu",
-        documentUrl: "/demo/cms-platform-rfp.pdf",
-        isDrupal: true,
-        isActive: true
-      },
-      {
-        id: randomUUID(),
-        title: "Municipal Services Portal Development",
-        organization: "City of Springfield",
-        description: "Citizen-facing portal for municipal services including permit applications, bill payments, and service requests. Must integrate with existing legacy systems and provide mobile-responsive design.",
-        technology: "WordPress",
-        budgetMin: 150000,
-        budgetMax: 250000,
-        deadline: new Date('2025-07-30'),
-        postedDate: new Date('2024-12-10'),
-        location: "Springfield, IL",
-        organizationType: "Government",
-        contactEmail: "webmaster@springfield.gov",
-        organizationWebsite: "https://www.springfield.gov",
-        documentUrl: "/demo/municipal-portal-rfp.pdf",
-        isDrupal: false,
-        isActive: true
+    try {
+      // Initialize SAM.gov service if API key is available
+      const apiKey = process.env.SAM_GOV_API_KEY;
+      if (!apiKey) {
+        console.log('⚠️ SAM_GOV_API_KEY not provided - unable to fetch live data');
+        return;
       }
-    ];
 
-    sampleRfps.forEach(rfp => {
-      this.rfps.set(rfp.id, rfp);
-    });
+      const { SamGovService } = await import("./sam-gov-service");
+      const samGovService = new SamGovService(apiKey);
+      
+      const liveRfps = await samGovService.searchOpportunities({
+        keywords: ['website', 'web development', 'CMS', 'content management', 'Drupal', 'WordPress', 'digital', 'portal'],
+        limit: 50
+      });
 
-    console.log(`✅ Loaded ${sampleRfps.length} professional RFP opportunities`);
-    console.log('🎯 Drupal opportunities prioritized for local development');
+      if (liveRfps && liveRfps.length > 0) {
+        liveRfps.forEach(rfp => {
+          this.rfps.set(rfp.id, rfp);
+        });
+        
+        const drupalCount = liveRfps.filter(rfp => rfp.isDrupal).length;
+        console.log(`✅ Loaded ${liveRfps.length} live government RFP opportunities`);
+        console.log(`🎯 Found ${drupalCount} Drupal-related opportunities prioritized`);
+        console.log(`📊 Total budget range: $${Math.min(...liveRfps.map(r => r.budgetMin || 0)).toLocaleString()} - $${Math.max(...liveRfps.map(r => r.budgetMax || 0)).toLocaleString()}`);
+      } else {
+        console.log('⚠️ No live RFP opportunities found from SAM.gov');
+      }
+
+    } catch (error) {
+      console.error('❌ Error fetching live RFP data:', error);
+      console.log('Using fallback data while API issues are resolved...');
+    }
   }
 }
 

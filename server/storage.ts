@@ -27,8 +27,8 @@ export class DatabaseStorage implements IStorage {
   private apiKey: string | null;
 
   constructor() {
-    // Initialize SAM.gov service if API key is available
-    this.apiKey = process.env.SAM_GOV_API_KEY || 'B4ferHa3AKlq54VDSlE2zFblbBvc0E4qekst9xtv';
+    // Initialize SAM.gov service with user's API key
+    this.apiKey = process.env.SAM_GOV_API_KEY || 'apbgf5Mx5PMy5ON18UqMwo8NB6jhua8EyQSIzHac';
     this.samGovService = this.apiKey ? new SamGovService(this.apiKey) : null;
     
     this.initializeRfps();
@@ -162,37 +162,65 @@ export class DatabaseStorage implements IStorage {
 
   private async loadRealRfps() {
     try {
-      console.log('Loading real RFP data from SAM.gov...');
+      console.log('🔄 Connecting to SAM.gov API for live government data...');
       
       if (!this.samGovService) {
-        throw new Error('SAM.gov service not available');
+        console.error('❌ SAM.gov service not available - API key issue');
+        return;
       }
 
+      console.log(`🔑 Using API key: ${this.apiKey?.substring(0, 8)}...`);
+      
+      // Set date range for current opportunities
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      const futureDate = new Date(today);
+      futureDate.setDate(today.getDate() + 120);
+
       const realRfps = await this.samGovService.searchOpportunities({
-        limit: 50,
-        postedFrom: '01/01/2024',
-        postedTo: '08/01/2025',
-        title: 'software'
+        keywords: ['website', 'web development', 'CMS', 'content management', 'Drupal', 'WordPress', 'digital', 'portal'],
+        limit: 50
       });
 
       if (Array.isArray(realRfps) && realRfps.length > 0) {
-        console.log(`Loaded ${realRfps.length} RFPs from SAM.gov`);
+        console.log(`📊 Retrieved ${realRfps.length} live government RFP opportunities`);
         
         // Insert real RFPs into database
+        let inserted = 0;
         for (const rfp of realRfps) {
-          await this.createRfp(rfp);
+          try {
+            await this.createRfp(rfp);
+            inserted++;
+          } catch (insertError) {
+            console.log(`Warning: Could not insert RFP ${rfp.id} - may already exist`);
+          }
+        }
+        
+        const drupalCount = realRfps.filter(rfp => rfp.isDrupal).length;
+        console.log(`✅ Successfully loaded ${inserted} live government RFP opportunities`);
+        console.log(`🎯 Found ${drupalCount} Drupal-related opportunities prioritized`);
+        
+        if (realRfps.length > 0) {
+          const budgets = realRfps.filter(rfp => rfp.budgetMin && rfp.budgetMax);
+          if (budgets.length > 0) {
+            const totalMin = budgets.reduce((sum, rfp) => sum + (rfp.budgetMin || 0), 0);
+            const totalMax = budgets.reduce((sum, rfp) => sum + (rfp.budgetMax || 0), 0);
+            console.log(`💰 Total opportunity value: $${totalMin.toLocaleString()} - $${totalMax.toLocaleString()}`);
+          }
         }
       } else {
-        throw new Error('No RFPs returned from SAM.gov API');
+        console.log('⚠️ No live government RFP opportunities found from SAM.gov API');
       }
       
-      console.log('✅ Real RFP data loaded successfully into production database');
     } catch (error) {
-      console.error('Error loading real RFP data:', error);
-      console.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
-      
-      // Load professional demo data instead
-      await this.loadProfessionalDemoData();
+      console.error('❌ Error connecting to SAM.gov API:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', error.message);
+        if (error.message.includes('401') || error.message.includes('403')) {
+          console.error('🔑 API authentication failed - please verify your SAM.gov API key');
+        }
+      }
     }
   }
 

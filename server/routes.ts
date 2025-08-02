@@ -129,19 +129,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Demo document download route for local development
-  app.get("/demo/:filename", (req, res) => {
-    const { filename } = req.params;
-    res.json({
-      message: "Demo Environment - Document Access",
-      filename: filename,
-      note: "In production, this would provide actual RFP documents. For local development, contact information is available in the RFP details.",
-      available_contacts: [
-        "procurement@regionalmedical.org",
-        "it-procurement@stateuniversity.edu", 
-        "webmaster@springfield.gov"
-      ]
-    });
+  // Live RFP statistics endpoint
+  app.get("/api/rfps/stats/live", async (req, res) => {
+    try {
+      const rfps = await storage.getRfps();
+      const stats = {
+        total: rfps.length,
+        drupal: rfps.filter(r => r.isDrupal).length,
+        totalBudget: rfps.reduce((sum, r) => sum + (r.budgetMax || 0), 0),
+        avgBudget: rfps.length > 0 ? Math.round(rfps.reduce((sum, r) => sum + ((r.budgetMin || 0) + (r.budgetMax || 0)) / 2, 0) / rfps.length) : 0,
+        deadlinesSoon: rfps.filter(r => {
+          const daysUntil = Math.ceil((new Date(r.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+          return daysUntil <= 30;
+        }).length
+      };
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching live stats:", error);
+      res.status(500).json({ message: "Failed to fetch live statistics" });
+    }
   });
 
   const httpServer = createServer(app);
