@@ -29,7 +29,8 @@ The REST API provides endpoints for RFP operations including listing RFPs with f
 - **Production Endpoints**: Added document download tracking, search analytics, and professional contact systems
 - **UI Enhancement**: Removed all demo notices and implemented professional messaging throughout the application
 - **Apple Silicon Compatibility**: Resolved M1 Ultra networking issues with Node.js 20 LTS and optimized server configurations
-- **Local Development**: Successfully deployed on user's M1 Ultra Mac with full functionality at localhost:8080
+- **Intel Mac Compatibility**: Optimized for Intel Core i9 iMac with standard Node.js configurations
+- **Local Development**: Successfully deployed on user's M1 Ultra Mac and Intel iMac with full functionality
 - **SAM.gov Integration**: Complete API framework ready for live government data when permissions are resolved
 
 ## External Dependencies
