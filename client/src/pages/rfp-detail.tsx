@@ -233,8 +233,16 @@ export default function RfpDetail() {
                       evaluation criteria, and procurement guidelines. Business email required for download access.
                     </p>
                   </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-blue-800 font-medium mb-2">Local Development Notice</p>
+                    <p className="text-blue-700 text-sm">
+                      In production, clicking this button would download the actual RFP document. 
+                      For local development, please contact the organization directly using the provided email address.
+                    </p>
+                  </div>
                   <div className="text-sm text-gray-600">
-                    <p><span className="font-medium">Document URL:</span> {rfp?.documentUrl}</p>
+                    <p><span className="font-medium">Contact Email:</span> {rfp?.contactEmail}</p>
+                    <p><span className="font-medium">Organization Website:</span> {rfp?.organizationWebsite}</p>
                   </div>
                 </div>
               </DialogContent>

@@ -136,7 +136,7 @@ export class MemStorage implements IStorage {
         organizationType: "Healthcare",
         contactEmail: "procurement@regionalmedical.org",
         organizationWebsite: "https://www.regionalmedical.org",
-        documentUrl: "https://www.regionalmedical.org/procurement/healthcare-data-system-rfp.pdf",
+        documentUrl: "/demo/healthcare-data-system-rfp.pdf",
         isDrupal: true,
         isActive: true
       },
@@ -154,7 +154,7 @@ export class MemStorage implements IStorage {
         organizationType: "Education",
         contactEmail: "it-procurement@stateuniversity.edu",
         organizationWebsite: "https://www.stateuniversity.edu",
-        documentUrl: "https://www.stateuniversity.edu/procurement/cms-platform-rfp.pdf",
+        documentUrl: "/demo/cms-platform-rfp.pdf",
         isDrupal: true,
         isActive: true
       },
@@ -172,7 +172,7 @@ export class MemStorage implements IStorage {
         organizationType: "Government",
         contactEmail: "webmaster@springfield.gov",
         organizationWebsite: "https://www.springfield.gov",
-        documentUrl: "https://www.springfield.gov/procurement/municipal-portal-rfp.pdf",
+        documentUrl: "/demo/municipal-portal-rfp.pdf",
         isDrupal: false,
         isActive: true
       }

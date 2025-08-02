@@ -129,6 +129,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Demo document download route for local development
+  app.get("/demo/:filename", (req, res) => {
+    const { filename } = req.params;
+    res.json({
+      message: "Demo Environment - Document Access",
+      filename: filename,
+      note: "In production, this would provide actual RFP documents. For local development, contact information is available in the RFP details.",
+      available_contacts: [
+        "procurement@regionalmedical.org",
+        "it-procurement@stateuniversity.edu", 
+        "webmaster@springfield.gov"
+      ]
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
