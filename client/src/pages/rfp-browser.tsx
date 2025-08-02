@@ -9,57 +9,45 @@ import { RfpCard } from "@/components/rfp-card";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import type { Rfp } from "@shared/schema";
-export default function RfpBrowser() {
+const ITEMS_PER_PAGE = 10;
+function RfpBrowser() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("deadline");
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
     technologies: [] as string[],
-    deadlineFilter: "",
-    budgetRange: "",
+    deadlineFilter: "all",
+    budgetRange: "any",
     organizationTypes: [] as string[],
   });
-  const ITEMS_PER_PAGE = 3;
-  const queryParams = useMemo(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.set("search", searchQuery);
-    if (filters.technologies.length > 0) {
-      filters.technologies.forEach(tech => params.append("technologies", tech));
-    }
-    if (filters.deadlineFilter) params.set("deadlineFilter", filters.deadlineFilter);
-    if (filters.budgetRange) params.set("budgetRange", filters.budgetRange);
-    if (filters.organizationTypes.length > 0) {
-      filters.organizationTypes.forEach(type => params.append("organizationTypes", type));
-    }
-    return params.toString();
-  }, [searchQuery, filters]);
-  const { data: rfps, isLoading, error } = useQuery<Rfp[]>({
-    queryKey: ["/api/rfps", queryParams],
-    queryFn: async () => {
-      const url = queryParams ? `/api/rfps?${queryParams}` : '/api/rfps';
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch RFPs: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    },
+  const { data: rfps = [], isLoading, error } = useQuery<Rfp[]>({
+    queryKey: ["/api/rfps", {
+      search: searchQuery || undefined,
+      technologies: filters.technologies.length > 0 ? filters.technologies : undefined,
+      deadlineFilter: filters.deadlineFilter !== "all" ? filters.deadlineFilter : undefined,
+      budgetRange: filters.budgetRange !== "any" ? filters.budgetRange : undefined,
+      organizationTypes: filters.organizationTypes.length > 0 ? filters.organizationTypes : undefined,
+    }],
   });
   const sortedRfps = useMemo(() => {
     if (!rfps) return [];
     
-    return [...rfps].sort((a, b) => {
-      switch (sortBy) {
-        case "budget":
-          const aBudget = a.budgetMax || a.budgetMin || 0;
-          const bBudget = b.budgetMax || b.budgetMin || 0;
-          return bBudget - aBudget;
-        case "posted":
-          return new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime();
-        case "deadline":
-        default:
-          return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+    const sorted = [...rfps].sort((a, b) => {
+      if (sortBy === "deadline") {
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      } else if (sortBy === "budget") {
+        const aBudget = a.budgetMax || a.budgetMin || 0;
+        const bBudget = b.budgetMax || b.budgetMin || 0;
+        return bBudget - aBudget;
+      } else if (sortBy === "posted") {
+        return new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime();
       }
+      return 0;
+    });
+    return sorted.sort((a, b) => {
+      if (a.isDrupal && !b.isDrupal) return -1;
+      if (!a.isDrupal && b.isDrupal) return 1;
+      return 0;
     });
   }, [rfps, sortBy]);
   const totalPages = Math.ceil(sortedRfps.length / ITEMS_PER_PAGE);
@@ -76,9 +64,9 @@ export default function RfpBrowser() {
       <div className="min-h-screen bg-gray-50">
         <Header />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-red-600">Error Loading RFPs</h1>
-            <p className="text-gray-600 mt-2">Please try refreshing the page.</p>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading RFPs</h2>
+            <p className="text-gray-600">Failed to load RFP data. Please try again later.</p>
           </div>
         </main>
         <Footer />
@@ -90,30 +78,43 @@ export default function RfpBrowser() {
       <Header />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Technology RFP Opportunities
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover and track Request for Proposal opportunities in technology, 
-              with a focus on Drupal, WordPress, and modern web development projects.
-            </p>
+        <div className="mb-8">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-black mb-2">Find Open Technology RFPs</h2>
+            <p className="text-gray-600 text-lg">Discover opportunities in Drupal, WordPress, and other technology projects</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="space-y-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder="Search RFPs by title, organization, or description..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-3 text-lg"
-                />
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="text-gray-400" />
               </div>
-              <SearchFilters filters={filters} onFiltersChange={setFilters} />
-              <div className="flex items-center gap-4">
+              <Input
+                type="text"
+                className="search-input block w-full pl-10 pr-12 py-4 text-lg border border-gray-300 rounded-xl focus:ring-brand-orange focus:border-brand-orange transition-all"
+                placeholder="Search RFPs by keywords, organization, or technology..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-brand-orange hover:text-orange-600">
+                <Filter className="text-xl" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
+          <div>
+            <SearchFilters filters={filters} onFiltersChange={setFilters} />
+          </div>
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-xl font-semibold text-black">Search Results</h3>
+                <p className="text-gray-600">
+                  {isLoading ? "Loading..." : `Found ${sortedRfps.length} open RFPs${totalPages > 1 ? ` (Page ${currentPage} of ${totalPages})` : ''}`}
+                </p>
+              </div>
+              <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-48">
@@ -201,7 +202,9 @@ export default function RfpBrowser() {
           </div>
         </div>
       </main>
+      
       <Footer />
     </div>
   );
 }
+export default RfpBrowser;

@@ -1,11 +1,5 @@
-import { type User, type InsertUser, type Rfp, type InsertRfp } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  
+import { Rfp } from "@shared/schema";
+interface IStorage {
   getRfps(filters?: {
     search?: string;
     technologies?: string[];
@@ -14,58 +8,21 @@ export interface IStorage {
     organizationTypes?: string[];
   }): Promise<Rfp[]>;
   getRfp(id: string): Promise<Rfp | undefined>;
-  createRfp(rfp: InsertRfp): Promise<Rfp>;
+  createRfp(rfp: Rfp): Promise<Rfp>;
+  getTechnologyCounts(): Record<string, number>;
 }
-
-export class MemStorage implements IStorage {
-  private users = new Map<string, User>();
-  private rfps = new Map<string, Rfp>();
-
+export class LocalStorage implements IStorage {
+  private rfps: Map<string, Rfp> = new Map();
   constructor() {
     this.initializeRfps();
   }
-
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    for (const user of Array.from(this.users.values())) {
-      if (user.email === username) {
-        return user;
-      }
-    }
-    return undefined;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const user: User = {
-      id: randomUUID(),
-      email: insertUser.email || null,
-      firstName: insertUser.firstName || null,
-      lastName: insertUser.lastName || null,
-      profileImageUrl: insertUser.profileImageUrl || null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.users.set(user.id, user);
-    return user;
-  }
-
   async getRfp(id: string): Promise<Rfp | undefined> {
     return this.rfps.get(id);
   }
-
-  async createRfp(insertRfp: InsertRfp): Promise<Rfp> {
-    const rfp: Rfp = {
-      id: randomUUID(),
-      postedDate: new Date(),
-      ...insertRfp,
-    };
+  async createRfp(rfp: Rfp): Promise<Rfp> {
     this.rfps.set(rfp.id, rfp);
     return rfp;
   }
-
   async getRfps(filters?: {
     search?: string;
     technologies?: string[];
@@ -74,7 +31,6 @@ export class MemStorage implements IStorage {
     organizationTypes?: string[];
   }): Promise<Rfp[]> {
     let rfps = Array.from(this.rfps.values());
-
     if (filters?.search) {
       const searchLower = filters.search.toLowerCase();
       rfps = rfps.filter(rfp => 
@@ -83,45 +39,35 @@ export class MemStorage implements IStorage {
         rfp.organization.toLowerCase().includes(searchLower)
       );
     }
-
     if (filters?.technologies?.length) {
       rfps = rfps.filter(rfp => filters.technologies!.includes(rfp.technology));
     }
-
     if (filters?.organizationTypes?.length) {
       rfps = rfps.filter(rfp => filters.organizationTypes!.includes(rfp.organizationType));
     }
-
-    if (filters?.budgetRange) {
+    if (filters?.budgetRange && filters.budgetRange !== "any") {
       const [min, max] = filters.budgetRange.split('-').map(Number);
       rfps = rfps.filter(rfp => {
         if (!rfp.budgetMin) return true;
         return rfp.budgetMin >= min && (max ? rfp.budgetMax && rfp.budgetMax <= max : true);
       });
     }
-
-    if (filters?.deadlineFilter) {
+    if (filters?.deadlineFilter && filters.deadlineFilter !== "all") {
       const now = new Date();
       const filterDays = parseInt(filters.deadlineFilter);
       const filterDate = new Date(now.getTime() + filterDays * 24 * 60 * 60 * 1000);
       
       rfps = rfps.filter(rfp => new Date(rfp.deadline) <= filterDate);
     }
-
     return rfps.sort((a, b) => {
-      // Prioritize Drupal RFPs
       if (a.isDrupal && !b.isDrupal) return -1;
       if (!a.isDrupal && b.isDrupal) return 1;
-      
-      // Then sort by deadline
       return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
     });
   }
-
-  private async initializeRfps() {
+  private initializeRfps() {
     console.log('Initializing professional RFP data for local development...');
     
-    // Professional RFP data with working hyperlinks
     const professionalRfps: Rfp[] = [
       {
         id: "a7dbc4d2-d166-4a3a-9882-0c656b3cce7f",
@@ -153,7 +99,7 @@ export class MemStorage implements IStorage {
         postedDate: new Date(),
         location: "Texas",
         organizationType: "Government",
-        contactEmail: "webdev@cityofinnovation.gov",
+        contactEmail: "webmaster@cityofinnovation.gov",
         organizationWebsite: "https://cityofinnovation.gov",
         documentUrl: "/api/rfps/municipal-portal/document",
         isDrupal: false,
@@ -162,33 +108,34 @@ export class MemStorage implements IStorage {
       {
         id: "cf973054-4f89-48af-bcc3-f35acf9c8616",
         title: "Healthcare Data Management System",
-        organization: "Regional Medical Center",
-        description: "Implementation of comprehensive healthcare data management system with HIPAA compliance, patient portal integration, and real-time analytics dashboard for clinical decision support.",
+        organization: "Regional Medical Alliance",
+        description: "Implementation of secure, HIPAA-compliant data management platform for multi-facility healthcare network with patient portal and provider collaboration tools.",
         technology: "Drupal",
-        budgetMin: 250000,
-        budgetMax: 350000,
-        deadline: new Date("2025-09-15"),
+        budgetMin: 450000,
+        budgetMax: 580000,
+        deadline: new Date("2025-12-01"),
         postedDate: new Date(),
         location: "California",
-        organizationType: "Healthcare",
-        contactEmail: "procurement@regionalmed.org",
-        organizationWebsite: "https://regionalmed.org",
-        documentUrl: "/api/rfps/healthcare-data-mgmt/document",
+        organizationType: "Non-profit",
+        contactEmail: "procurement@medalliance.org",
+        organizationWebsite: "https://regionalmedical.org",
+        documentUrl: "/api/rfps/healthcare-data/document",
         isDrupal: true,
         isActive: true
       }
     ];
-
-    // Clear existing data and load fresh professional RFPs
-    this.rfps.clear();
-    
-    professionalRfps.forEach(rfp => {
+    for (const rfp of professionalRfps) {
       this.rfps.set(rfp.id, rfp);
-    });
-
-    console.log(`Successfully loaded ${professionalRfps.length} professional RFP opportunities`);
+    }
+    console.log('Successfully loaded 3 professional RFP opportunities');
     console.log('RFP titles:', professionalRfps.map(rfp => rfp.title));
   }
+  getTechnologyCounts(): Record<string, number> {
+    const counts: Record<string, number> = {};
+    for (const rfp of this.rfps.values()) {
+      counts[rfp.technology] = (counts[rfp.technology] || 0) + 1;
+    }
+    return counts;
+  }
 }
-
-export const storage = new MemStorage();
+export const storage = new LocalStorage();
