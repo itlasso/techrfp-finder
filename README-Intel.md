@@ -72,6 +72,7 @@ npm install
 **Network Access:**
 - Application accessible at localhost:5000
 - Intel Macs typically have no networking issues with Node.js
+- Clear browser cache if RFP links show 404 errors (Cmd+Shift+R)
 - Firewall settings may need adjustment for external access
 
 ## Production Features Available

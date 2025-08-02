@@ -25,6 +25,7 @@ fi
 echo "✅ Starting server with localhost binding for Intel Mac..."
 echo "🌐 Application will be available at: http://localhost:5000"
 echo "🔗 All hyperlinks will work properly with this configuration"
+echo "💡 Clear browser cache if links show 404 errors"
 echo ""
 
 # Start the development server
